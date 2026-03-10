@@ -590,22 +590,19 @@ Phase: **Ideation & Planning Complete**
 
 ## Implementation Checklist
 
-- [ ] Initialize Node.js project (`npm init`)
-- [ ] Create `http-demo/rawServer.js` with bare `http.createServer()`
-- [ ] Setup Express server (`server.js`)
-- [ ] Configure MongoDB connection (`config/db.js`)
-- [ ] Create `public/index.html` and wire `express.static('public')`
-- [ ] Implement `experienceModel.js` (with tags field)
-- [ ] Implement experience routes and controller (CRUD + search + export)
-- [ ] Implement `loggerMiddleware.js` using `fs.appendFile`
-- [ ] Implement `validationMiddleware.js`
-- [ ] Implement `requireApiKey.js` as router-level middleware
-- [ ] Install and wire morgan, cors, helmet
-- [ ] Implement analytics routes and controller
-- [ ] Implement `errorMiddleware.js`
-- [ ] Implement `/api/experiences/export` using `fs.createReadStream`
-- [ ] Test all endpoints in Postman
-- [ ] Prepare presentation slides
+- [ ] Step 1 — Init project: `npm init`, install packages, create folder structure
+- [ ] Step 2 — `server.js`: bare Express server running on a port
+- [ ] Step 3 — `config/db.js`: MongoDB connection via Mongoose
+- [ ] Step 4 — `public/index.html` + `express.static()`: static file serving
+- [ ] Step 5 — `models/experienceModel.js`: Mongoose schema
+- [ ] Step 6 — `middleware/loggerMiddleware.js`: app-level, writes to `logs/requests.log` via `fs`
+- [ ] Step 7 — `middleware/validationMiddleware.js`: router-level, validates POST/PUT body
+- [ ] Step 8 — `middleware/errorMiddleware.js`: centralized error handler
+- [ ] Step 9 — `routes/` + `controllers/`: CRUD endpoints
+- [ ] Step 10 — Search + filter + export endpoints (`fs.createReadStream`)
+- [ ] Step 11 — `routes/analyticsRoutes.js` + `controllers/analyticsController.js`
+- [ ] Step 12 — Full Postman test of all endpoints
+- [ ] Step 13 — Presentation slides
 
 
 ---
