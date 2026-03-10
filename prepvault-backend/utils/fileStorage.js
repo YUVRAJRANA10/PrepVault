@@ -15,3 +15,5 @@ async function saveExperiences(data) {
     const json = JSON.stringify(data, null, 2)
     await fs.writeFile(DATA_FILE, json)
 }
+
+module.exports = {readExperiences,saveExperiences}

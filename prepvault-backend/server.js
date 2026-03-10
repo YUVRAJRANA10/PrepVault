@@ -5,6 +5,9 @@ const app = express()
 const PORT = process.env.PORT || 5000
 
 app.use(express.json()) // middleware: parses incoming JSON request bodies
+app.use(express.static('public')) // serves public/index.html at http://localhost:5000/
+
+const loggerMiddlewear = require('./middleware/loggerMiddleware')
 
 app.get('/', (req, res) => {
   res.json({ message: 'PrepVault API is running' })
