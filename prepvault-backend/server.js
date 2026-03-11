@@ -14,6 +14,10 @@ app.use(express.static('public')) // serves public/index.html at http://localhos
 const experienceRoutes = require('./routes/experienceRoutes')
 app.use('/api/experiences', experienceRoutes)
 
+const analyticsRoutes = require('./routes/analyticsRoutes')
+app.use('/api/analytics', analyticsRoutes)
+
+
 app.get('/', (req, res) => {
   res.json({ message: 'PrepVault API is running' })
 })

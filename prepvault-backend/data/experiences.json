@@ -18,5 +18,25 @@
       "What is REST?",
       "Explain closures"
     ]
+  },
+   {
+    "id": "1773209837948",
+    "company": "amazon",
+    "role": "SDE Intern",
+    "difficulty": 4,
+    "questions": [
+      "What is RESTT?",
+      "Explain closures"
+    ]
+  },
+   {
+    "id": "1773209837948",
+    "company": "amazon",
+    "role": "SDE Intern",
+    "difficulty": 4,
+    "questions": [
+      "What is REST?",
+      "Explain closures"
+    ]
   }
 ]
