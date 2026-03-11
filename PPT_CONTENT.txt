@@ -1,0 +1,226 @@
+====================================================
+PrepVault — PPT Content (8-10 Slides)
+====================================================
+
+
+SLIDE 1 — TITLE SLIDE
+-----------------------
+Title: PrepVault
+Subtitle: A Community-Driven Interview Experience Vault
+Course: Backend Engineering – I | Evaluation 1
+Visual: Full-screen screenshot of Home page (vault door + company logos bursting out)
+
+
+SLIDE 2 — PROBLEM STATEMENT
+-----------------------------
+Heading: The Problem
+
+- No single place to find REAL interview experiences
+- Info scattered — Reddit, Quora, LeetCode Discuss, word-of-mouth
+- No filter by company + difficulty + topic
+- Students go in BLIND — don't know what to expect
+- Experiences get LOST — not archived or searchable
+
+Visual: Split — left: messy Reddit thread / right: PrepVault clean Explore page
+
+
+SLIDE 3 — OUR SOLUTION
+------------------------
+Heading: PrepVault — What it does
+
+- BROWSE real interview experiences by company, role, difficulty
+- FILTER by topics: DSA · DBMS · OS · CN · HR
+- SUBMIT your own experience — questions, tips, rounds
+- SAVE experiences to favourites (localStorage)
+- DETAIL VIEW — full questions + prep tips in one screen
+- ANALYTICS — common questions per company, difficulty breakdown
+
+Visual: Screenshot of Explore page with filters active (company pills + difficulty)
+
+
+SLIDE 4 — TECH STACK
+----------------------
+Heading: Tech Stack
+
+Layer         | Technology
+--------------|--------------------------------------------
+Frontend      | React (Vite), React Router, Framer Motion
+HTTP Client   | Axios (proxy → port 5000)
+Backend       | Node.js + Express.js v5
+Data Storage  | JSON file via Node.js fs/promises
+Logging       | Morgan (3rd party) + Custom fs.appendFile
+Dev Tools     | Nodemon, dotenv
+
+Keywords: REST API · Middleware Stack · JSON Storage · MVC Pattern · Proxy
+
+Architecture:
+React :5173  →  Vite Proxy  →  Express :5000  →  experiences.json
+
+Visual: Simple arrow diagram above
+
+
+SLIDE 5 — DATA FORMAT (What gets saved)
+-----------------------------------------
+Heading: Data Model — experiences.json
+
+{
+  "id": "sample_001",
+  "company": "Google",
+  "role": "SDE Intern",
+  "rounds": 4,
+  "difficulty": 5,
+  "questions": [
+    "Design a URL shortener...",
+    "Implement LRU Cache..."
+  ],
+  "tags": ["DSA", "OS", "DBMS"],
+  "tips": "Focus on system design, revise BFS/DFS",
+  "submittedBy": "Arjun M.",
+  "createdAt": "2025-01-15T10:30:00.000Z"
+}
+
+Field notes:
+- difficulty  → number 1–5 (validated by middleware)
+- questions   → non-empty array (validated)
+- tags        → topic classification
+- id          → Date.now() timestamp
+- createdAt   → ISO string
+
+Visual: JSON block screenshot from VS Code / the file itself
+
+
+SLIDE 6 — BACKEND ROUTES + WHAT HITS WHEN
+-------------------------------------------
+Heading: API Routes — Live During Frontend Use
+
+Frontend Action              | Method  | Route
+-----------------------------|---------|--------------------------------------------
+Page loads / Explore opens   | GET     | /api/experiences
+Filter by company            | GET     | /api/experiences
+Search by keyword            | GET     | /api/experiences
+Submit new experience        | POST    | /api/experiences  (+ Validation middleware)
+Edit an experience           | PUT     | /api/experiences/:id  (+ Validation)
+Delete an experience         | DELETE  | /api/experiences/:id
+Analytics: common questions  | GET     | /api/analytics/common-questions/:company
+Analytics: difficulty        | GET     | /api/analytics/difficulty-summary
+
+Key points:
+- ALL requests hit loggerMiddleware first → writes to logs/requests.log
+- POST + PUT additionally hit validateExperience middleware
+- Errors caught by errorMiddleware (4-arg handler) — last in chain
+
+Sample log output:
+[2025-03-11T10:15:22.000Z] GET /api/experiences
+[2025-03-11T10:16:04.000Z] POST /api/experiences
+
+Visual: Screenshot of logs/requests.log in VS Code
+
+
+SLIDE 7 — MIDDLEWARE STACK
+----------------------------
+Heading: Middleware Chain — Every Request Passes Through
+
+REQUEST
+  ↓
+express.json()         ← parses incoming JSON body
+  ↓
+loggerMiddleware       ← logs method + URL + timestamp to file (fs.appendFile)
+  ↓
+morgan                 ← 3rd party HTTP logger
+  ↓
+express.static()       ← serves public/index.html
+  ↓
+Route Handler          ← GET / POST / PUT / DELETE
+  [validateExperience for POST/PUT only — router-level]
+  ↓
+Controller             ← reads/writes experiences.json via fs/promises
+  ↓
+errorMiddleware        ← catches any error, sends clean JSON response
+
+Types:
+- App-level middleware   → express.json, loggerMiddleware, morgan, static
+- Router-level middleware → validateExperience (only on POST/PUT)
+- Error middleware        → 4 arguments (err, req, res, next) — must be last
+
+Visual: File tree screenshot:
+middleware/
+  loggerMiddleware.js
+  validationMiddleware.js
+  errorMiddleware.js
+
+
+SLIDE 8 — FRONTEND FLOW (User Journey)
+----------------------------------------
+Heading: User Journey — 3 Steps
+
+STEP 1 — Home Page
+- Vault door animation (SVG, hover to open)
+- Company logos bursting outward (Google, Amazon, Microsoft, Meta...)
+- Stats: total experiences, companies covered, questions archived
+
+STEP 2 — Explore Page
+- Filter by company (e.g. Google) → difficulty Hard → matching cards shown
+- Click any card → Detail modal opens (company, role, all questions, tips, author)
+- Heart button → Save to favourites → persists across reloads (localStorage)
+- "Saved" pill filter → view only saved experiences
+
+STEP 3 — Submit Experience
+- Click + FAB button → modal form opens
+- Fill: Company, Role, Rounds, Difficulty (slider 1-5), Questions (one per line),
+         Topics (DSA/DBMS/OS/CN/HR), Tips, Your Name (optional)
+- Hits POST /api/experiences → validated → saved → card appears instantly
+
+Visual: 3 screenshots — Home / Explore with detail modal open / Add modal
+
+
+SLIDE 9 — KEY CONCEPTS COVERED (Viva-Ready)
+---------------------------------------------
+Heading: Concepts Demonstrated
+
+Concept                  | Where in project
+-------------------------|--------------------------------------------
+fs/promises module       | utils/fileStorage.js — readFile / writeFile
+Static file serving      | express.static('public') in server.js
+App-level middleware     | loggerMiddleware, express.json()
+Router-level middleware  | validateExperience on POST/PUT only
+Error middleware         | errorMiddleware.js — 4-arg signature
+Third-party middleware   | morgan (HTTP logger)
+REST principles          | GET/POST/PUT/DELETE on /api/experiences
+MVC Pattern              | routes → controllers → utils separation
+HTTP module              | Node's http module used by Express internally
+dotenv                   | .env file → process.env.PORT
+
+
+SLIDE 10 — CONCLUSION
+-----------------------
+Heading: Conclusion
+
+- PrepVault solves a REAL problem students face
+- Full REST API with proper separation of concerns
+- Demonstrates ALL major Node.js/Express syllabus concepts
+- No database needed — fs module proves file I/O mastery
+- Frontend built with React + Vite — proxy architecture
+- Unique UI: vault animation, company burst, detail modal, favourites
+
+Closing line (big, centered):
+"Real experiences. Real routes. Real code."
+
+Visual: Home page screenshot full bleed — vault door open, logos flying out
+
+
+====================================================
+SCREENSHOT CHECKLIST (take these before presenting)
+====================================================
+
+1.  Home page — vault door CLOSED
+2.  Home page — vault door OPEN (hover state)
+3.  Home page — company logos mid-burst animation
+4.  Explore page — all 8 cards visible
+5.  Explore page — filtered by "Google" only
+6.  Explore page — detail modal OPEN (all questions visible)
+7.  Add Experience modal open (form visible)
+8.  logs/requests.log file in VS Code
+9.  experiences.json open in VS Code (data format)
+10. File tree: middleware/ controllers/ routes/ utils/
+
+====================================================
