@@ -1,0 +1,148 @@
+const fs = require('fs')
+const path = require('path')
+
+const data = [
+  {
+    id: 'sample_001',
+    company: 'Google',
+    role: 'SDE Intern',
+    rounds: 4,
+    difficulty: 5,
+    questions: [
+      'Design a URL shortener — discuss DB schema and scalability',
+      'Find all pairs in an array that sum to a target value',
+      'What is the difference between a process and a thread?',
+      'Explain the CAP theorem with a real-world example',
+      'Implement LRU Cache with O(1) get and put'
+    ],
+    tags: ['DSA', 'OS', 'DBMS'],
+    tips: 'Focus heavily on system design even for intern roles. Google expects you to think at scale. Revise BFS/DFS thoroughly.',
+    submittedBy: 'Arjun M.',
+    createdAt: '2025-01-15T10:30:00.000Z'
+  },
+  {
+    id: 'sample_002',
+    company: 'Amazon',
+    role: 'SDE-1',
+    rounds: 5,
+    difficulty: 4,
+    questions: [
+      'Tell me about a time you had a conflict with a teammate',
+      'Design a shopping cart service',
+      'Reverse a linked list in groups of K',
+      'What are indexes in SQL and when would you avoid them?',
+      'Explain eventual consistency vs strong consistency'
+    ],
+    tags: ['DSA', 'DBMS', 'HR'],
+    tips: 'Amazon loves Leadership Principles — have 3-4 STAR stories ready. At least 2 rounds will be purely behavioral.',
+    submittedBy: 'Sneha R.',
+    createdAt: '2025-02-03T09:15:00.000Z'
+  },
+  {
+    id: 'sample_003',
+    company: 'Microsoft',
+    role: 'Software Engineer Intern',
+    rounds: 3,
+    difficulty: 3,
+    questions: [
+      'What is polymorphism? Give a real-world example',
+      'Find the height of a binary tree',
+      'Explain how HTTPS works end-to-end',
+      'What happens when you type a URL in a browser?'
+    ],
+    tags: ['DSA', 'CN'],
+    tips: 'Microsoft interviews are collaborative. Think out loud. Revise OOP and basic networking.',
+    submittedBy: 'Priya K.',
+    createdAt: '2025-01-28T14:00:00.000Z'
+  },
+  {
+    id: 'sample_004',
+    company: 'Flipkart',
+    role: 'Backend Engineer',
+    rounds: 4,
+    difficulty: 4,
+    questions: [
+      'Design a notification system for 10 million users',
+      'Find the median of a data stream',
+      'What is database sharding and when should you use it?',
+      'Explain the differences between SQL and NoSQL',
+      'How does a message queue like Kafka work?'
+    ],
+    tags: ['DSA', 'DBMS'],
+    tips: 'Flipkart backend rounds are heavily systems-focused. Know Redis caching, Kafka basics, and scaling patterns.',
+    submittedBy: 'Rahul V.',
+    createdAt: '2025-02-10T11:30:00.000Z'
+  },
+  {
+    id: 'sample_005',
+    company: 'Infosys',
+    role: 'Systems Engineer',
+    rounds: 2,
+    difficulty: 2,
+    questions: [
+      'Difference between overloading and overriding?',
+      'Explain the OSI model layers',
+      'Write a program to check if a string is a palindrome',
+      'What is normalization? Explain 1NF, 2NF, 3NF'
+    ],
+    tags: ['DBMS', 'CN'],
+    tips: 'Infosys focuses on fundamentals. Revise DBMS normalization, basic OOP, and aptitude.',
+    submittedBy: 'Meera S.',
+    createdAt: '2025-01-20T08:00:00.000Z'
+  },
+  {
+    id: 'sample_006',
+    company: 'TCS',
+    role: 'Associate Software Engineer',
+    rounds: 2,
+    difficulty: 1,
+    questions: [
+      'Tell me about yourself',
+      'What are your strengths and weaknesses?',
+      'Write a program to find factorial of a number',
+      'What is SDLC? Name the phases'
+    ],
+    tags: ['HR'],
+    tips: 'TCS NQT is the main filter. After that it is mostly HR. Be presentable and have your STAR stories ready.',
+    submittedBy: 'Vikram T.',
+    createdAt: '2025-01-05T10:00:00.000Z'
+  },
+  {
+    id: 'sample_007',
+    company: 'Atlassian',
+    role: 'Full Stack Intern',
+    rounds: 3,
+    difficulty: 3,
+    questions: [
+      'Design a task management system (like Jira) at the DB level',
+      'What is the event loop in JavaScript?',
+      'Explain REST vs GraphQL',
+      'Find all permutations of a string'
+    ],
+    tags: ['DSA', 'CN'],
+    tips: 'Atlassian values problem-solving approach over perfect solutions. Talk through your thought process loudly.',
+    submittedBy: 'Aisha N.',
+    createdAt: '2025-02-18T13:00:00.000Z'
+  },
+  {
+    id: 'sample_008',
+    company: 'Wipro',
+    role: 'Project Engineer',
+    rounds: 2,
+    difficulty: 2,
+    questions: [
+      'Difference between abstract class and interface',
+      'Explain deadlock and how to prevent it',
+      'What is a foreign key? Write a JOIN query',
+      'Explain the 3-tier architecture'
+    ],
+    tags: ['DBMS', 'OS'],
+    tips: 'Wipro Elite NTH: aptitude, coding, and technical rounds. Revise sorting algorithms and SQL.',
+    submittedBy: 'Karan B.',
+    createdAt: '2025-01-12T15:45:00.000Z'
+  }
+]
+
+const outPath = path.join(__dirname, '../data/experiences.json')
+fs.writeFileSync(outPath, JSON.stringify(data, null, 2))
+console.log(`Written ${data.length} entries to ${outPath}`)

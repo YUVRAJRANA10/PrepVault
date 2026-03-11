@@ -16,7 +16,12 @@ async function createExperience(req,res){
     company: company,
     role: role,
     difficulty: difficulty,
-    questions: questions
+    questions: questions,
+    rounds: req.body.rounds || 1,
+    tags: req.body.tags || [],
+    tips: req.body.tips || '',
+    submittedBy: req.body.submittedBy || 'Anonymous',
+    createdAt: new Date().toISOString()
    }
    data.push(newexperience);
    
