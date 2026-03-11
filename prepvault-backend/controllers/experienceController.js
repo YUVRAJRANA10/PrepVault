@@ -5,6 +5,8 @@ async function getAllExperiences(req,res){
     const data = await fileStorage.readExperiences();
     res.json(data)
 }
+
+
 async function createExperience(req,res){
    const data = await fileStorage.readExperiences();
    const { company, role, difficulty, questions } = req.body
@@ -22,6 +24,10 @@ async function createExperience(req,res){
 
   res.status(201).json({ success: true, data: newexperience })
 }
+
+
+
+
 async function updateExperience(req, res) {
   const data = await fileStorage.readExperiences()
 
@@ -37,6 +43,9 @@ async function updateExperience(req, res) {
   await fileStorage.saveExperiences(data)
   res.json({ success: true, data: data[index] })
 }
+
+
+
 async function deleteExperience(req, res) {
   const data = await fileStorage.readExperiences()
 
@@ -53,6 +62,7 @@ async function deleteExperience(req, res) {
   await fileStorage.saveExperiences(data)
   res.json({ success: true, data: deleted })
 }
+
 
 
 module.exports = {
