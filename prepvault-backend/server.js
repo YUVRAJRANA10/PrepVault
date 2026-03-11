@@ -11,7 +11,8 @@ app.use(loggerMiddlewear)
 
 app.use(express.static('public')) // serves public/index.html at http://localhost:5000/
 
-
+const experienceRoutes = require('./routes/experienceRoutes')
+app.use('/api/experiences', experienceRoutes)
 
 app.get('/', (req, res) => {
   res.json({ message: 'PrepVault API is running' })
