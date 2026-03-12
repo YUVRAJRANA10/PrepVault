@@ -65,16 +65,34 @@ function VaultDoor({ isOpen }) {
         )
       })}
 
-      {/* Handle */}
+      {/* Handle — 8-spoke vault wheel */}
       <motion.g
         style={{ transformBox: 'fill-box', transformOrigin: '140px 140px' }}
-        animate={isOpen ? { rotate: 90 } : { rotate: 0 }}
-        transition={{ duration: 0.35, delay: 0.28 }}
+        animate={isOpen ? { rotate: 67 } : { rotate: 0 }}
+        transition={{ duration: 0.55, delay: 0.28, ease: [0.23, 1, 0.32, 1] }}
       >
-        <circle cx="140" cy="140" r="32" fill="#0c0c22" stroke="#c89b3c" strokeWidth="3" />
-        <line x1="108" y1="140" x2="172" y2="140" stroke="#c89b3c" strokeWidth="3.5" strokeLinecap="round" />
-        <line x1="140" y1="108" x2="140" y2="172" stroke="#c89b3c" strokeWidth="3.5" strokeLinecap="round" />
-        <circle cx="140" cy="140" r="7" fill="#c89b3c" />
+        <circle cx="140" cy="140" r="33" fill="#0c0c22" stroke="#c89b3c" strokeWidth="3" />
+        {/* Rim accent */}
+        <circle cx="140" cy="140" r="28" fill="none" stroke="#c89b3c" strokeWidth="0.6" opacity="0.3" />
+        {/* 8 spokes at 0°, 45°, 90°, 135° — each drawn as full diameter */}
+        {[0, 45, 90, 135].map(a => {
+          const rad = (a * Math.PI) / 180
+          const cosA = Math.cos(rad), sinA = Math.sin(rad)
+          return (
+            <g key={a}>
+              <line
+                x1={140 + 26 * cosA} y1={140 + 26 * sinA}
+                x2={140 - 26 * cosA} y2={140 - 26 * sinA}
+                stroke="#c89b3c" strokeWidth="2.5" strokeLinecap="round"
+              />
+              <circle cx={140 + 29 * cosA} cy={140 + 29 * sinA} r="3.5" fill="#c89b3c" opacity="0.85" />
+              <circle cx={140 - 29 * cosA} cy={140 - 29 * sinA} r="3.5" fill="#c89b3c" opacity="0.85" />
+            </g>
+          )
+        })}
+        {/* Center hub */}
+        <circle cx="140" cy="140" r="6.5" fill="#c89b3c" />
+        <circle cx="140" cy="140" r="3" fill="#0c0c22" />
       </motion.g>
     </svg>
   )
@@ -125,10 +143,39 @@ export default function VaultHero() {
           onClick={() => navigate('/explore')}
         >
           {/* Behind the door — always visible */}
-          <div className="vault-reveal">
+          <div className={`vault-reveal${isOpen ? ' open' : ''}`}>
             <div className="vault-reveal-inner">
-              <span className="vault-unlock-icon">🔓</span>
-              <span className="vault-unlock-text">Enter the Vault</span>
+              {/* Animated SVG padlock — shackle lifts when vault opens */}
+              <svg className="vault-svg-lock" width="46" height="54" viewBox="0 0 46 54" fill="none">
+                {/* Body */}
+                <rect x="2" y="24" width="42" height="28" rx="5" fill="#0a0a1e" stroke="#c89b3c" strokeWidth="2.5" />
+                {/* Inner body accent */}
+                <rect x="6" y="28" width="34" height="20" rx="2" fill="none" stroke="#c89b3c" strokeWidth="0.7" opacity="0.28" />
+                {/* Keyhole */}
+                <circle cx="23" cy="36" r="5" fill="#c89b3c" />
+                <path d="M20.5 39 L20.5 47 L25.5 47 L25.5 39 Z" fill="#c89b3c" />
+                {/* Shackle — translates up and fades when open */}
+                <motion.g
+                  animate={isOpen ? { y: -13, opacity: 0 } : { y: 0, opacity: 1 }}
+                  transition={{ duration: 0.38, delay: isOpen ? 0.3 : 0, ease: 'easeInOut' }}
+                >
+                  <path
+                    d="M12 24 L12 14 A11 11 0 0 1 34 14 L34 24"
+                    stroke="#c89b3c" strokeWidth="4.5" strokeLinecap="round" fill="none"
+                  />
+                </motion.g>
+              </svg>
+              <motion.span
+                className="vault-unlock-text"
+                animate={
+                  isOpen
+                    ? { opacity: 1, letterSpacing: '0.22em', color: '#f2c96a' }
+                    : { opacity: 0.6, letterSpacing: '0.08em', color: '#c89b3c' }
+                }
+                transition={{ duration: 0.38 }}
+              >
+                Enter the Vault
+              </motion.span>
             </div>
           </div>
 

@@ -1,49 +1,37 @@
 import { motion } from 'framer-motion'
 
-// Real company favicons via Google's favicon API
 const COMPANIES = [
-  'google.com',
-  'amazon.com',
-  'microsoft.com',
-  'meta.com',
-  'apple.com',
-  'netflix.com',
-  'spotify.com',
-  'linkedin.com',
-  'atlassian.com',
-  'adobe.com',
-  'github.com',
-  'stripe.com',
-  'slack.com',
-  'uber.com',
-  'airbnb.com',
-  'salesforce.com',
-  'notion.so',
-  'figma.com',
-  'zoom.us',
-  'oracle.com',
+  'google.com', 'amazon.com', 'microsoft.com', 'meta.com',
+  'apple.com', 'netflix.com', 'spotify.com', 'linkedin.com',
+  'atlassian.com', 'adobe.com', 'github.com', 'stripe.com',
+  'slack.com', 'uber.com', 'airbnb.com', 'salesforce.com',
+  'notion.so', 'figma.com', 'zoom.us', 'oracle.com',
 ]
 
-const NUM = 20           // total particle lanes
-const STAGGER = 0.3      // seconds between each launch
-const DURATION = 3.4     // seconds to travel from center to edge
-const CYCLE = NUM * STAGGER   // = 6s full cycle
-const REPEAT_DELAY = CYCLE - DURATION  // = 2.6s wait before repeating
+// ── Design: multiple waves, each wave shoots all directions at once ──
+// At any moment multiple waves are mid-flight → feels like continuous stream
+const NUM_DIRECTIONS = 10   // angles per wave (36° apart)
+const NUM_WAVES = 4         // overlapping waves
+const DURATION = 5.5        // seconds per logo journey — slow enough to recognise
+const WAVE_OFFSET = DURATION / NUM_WAVES  // 1.375s between wave starts
 
-// Pre-compute all particle paths (deterministic, no runtime Math.random)
-const PARTICLES = Array.from({ length: NUM }, (_, i) => {
-  const angle = (i * 360) / NUM            // evenly spaced angles around 360°
-  const rad = (angle * Math.PI) / 180
-  const dist = 190 + (i % 4) * 28         // 190, 218, 246, 274px — varied depth
-  return {
-    id: i,
-    tx: Math.cos(rad) * dist,
-    ty: Math.sin(rad) * dist,
-    delay: i * STAGGER,
-    domain: COMPANIES[i % COMPANIES.length],
-    name: COMPANIES[i % COMPANIES.length].split('.')[0],
+const PARTICLES = []
+for (let w = 0; w < NUM_WAVES; w++) {
+  for (let d = 0; d < NUM_DIRECTIONS; d++) {
+    // Each wave rotated slightly so logos don't stack exactly on top
+    const angle = (d * 360) / NUM_DIRECTIONS + w * 9
+    const rad = (angle * Math.PI) / 180
+    // Vary distance so waves look like different "depth" streams
+    const dist = 160 + (w * 22) + (d % 3) * 18
+    PARTICLES.push({
+      id: w * NUM_DIRECTIONS + d,
+      tx: Math.cos(rad) * dist,
+      ty: Math.sin(rad) * dist,
+      initialDelay: w * WAVE_OFFSET,
+      domain: COMPANIES[(w * NUM_DIRECTIONS + d) % COMPANIES.length],
+    })
   }
-})
+}
 
 export default function CompanyBurst() {
   return (
@@ -53,25 +41,25 @@ export default function CompanyBurst() {
           key={p.id}
           className="burst-particle"
           animate={{
-            x: [0, p.tx * 0.1, p.tx],
-            y: [0, p.ty * 0.1, p.ty],
+            x: [0, p.tx * 0.08, p.tx],
+            y: [0, p.ty * 0.08, p.ty],
             opacity: [0, 0, 1, 1, 0],
-            scale:   [0.3, 0.6, 1.15, 1, 0.55],
+            scale:   [0.3, 0.65, 1.2, 1.1, 0.5],
           }}
           transition={{
             duration: DURATION,
-            delay: p.delay,
+            delay: p.initialDelay,
             repeat: Infinity,
-            repeatDelay: REPEAT_DELAY,
+            repeatDelay: 0,
             ease: 'easeOut',
-            times: [0, 0.05, 0.15, 0.68, 1],
+            times: [0, 0.05, 0.15, 0.78, 1],  // stays at full opacity until 78% of journey
           }}
         >
           <img
             src={`https://www.google.com/s2/favicons?domain=${p.domain}&sz=64`}
-            alt={p.name}
-            width={30}
-            height={30}
+            alt=""
+            width={36}
+            height={36}
             draggable={false}
           />
         </motion.div>
@@ -79,3 +67,4 @@ export default function CompanyBurst() {
     </div>
   )
 }
+
