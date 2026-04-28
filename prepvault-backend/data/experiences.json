@@ -183,22 +183,438 @@
   },
   {
     "id": "1773245594030",
-    "company": "tcs",
-    "role": "sde intern",
+    "company": "TCS",
+    "role": "SDE Intern",
     "difficulty": 2,
     "questions": [
-      "HashMAp?",
-      "Trees?",
-      "intenral workingg arrayLiast"
+      "What is HashMap and how does it work internally?",
+      "Explain Trees — BFS vs DFS",
+      "Internal working of ArrayList in Java"
     ],
     "rounds": 5,
-    "tags": [
-      "DSA",
-      "OS",
-      "CN"
-    ],
-    "tips": "Linkedin\nsrtiver a2z sgheet ",
-    "submittedBy": "panshul",
+    "tags": ["DSA", "OS", "CN"],
+    "tips": "LinkedIn + Striver A2Z sheet is enough. Focus on time complexity for every solution.",
+    "submittedBy": "Panshul",
     "createdAt": "2026-03-11T16:13:14.030Z"
+  },
+  {
+    "id": "sample_009",
+    "company": "Google",
+    "role": "SDE-1",
+    "rounds": 5,
+    "difficulty": 5,
+    "questions": [
+      "Design Google Docs — how do you handle concurrent edits?",
+      "Serialize and deserialize a binary tree",
+      "Find the maximum sum subarray (Kadane's algorithm)",
+      "What is consistent hashing? Where is it used?",
+      "Explain garbage collection in Java or Go"
+    ],
+    "tags": ["DSA", "System Design", "OS"],
+    "tips": "Google SDE-1 is as hard as intern. Two coding rounds + one system design. Know Kadane, DP on trees, and segment trees.",
+    "submittedBy": "Dev P.",
+    "createdAt": "2025-03-05T09:00:00.000Z"
+  },
+  {
+    "id": "sample_010",
+    "company": "Google",
+    "role": "Software Engineer (New Grad)",
+    "rounds": 4,
+    "difficulty": 5,
+    "questions": [
+      "Word ladder problem — BFS approach",
+      "Design YouTube's video recommendation pipeline",
+      "What is a bloom filter and when would you use one?",
+      "Minimum window substring — sliding window",
+      "Explain how TCP handles congestion"
+    ],
+    "tags": ["DSA", "System Design", "CN"],
+    "tips": "Google expects clean code with edge cases handled. Mock 50+ Leetcode hards. System design needs whiteboard-level depth.",
+    "submittedBy": "Ishaan T.",
+    "createdAt": "2025-04-12T11:20:00.000Z"
+  },
+  {
+    "id": "sample_011",
+    "company": "Amazon",
+    "role": "SDE Intern",
+    "rounds": 3,
+    "difficulty": 3,
+    "questions": [
+      "Tell me about a time you went above and beyond",
+      "Implement a stack with getMin() in O(1)",
+      "What is the difference between SQL JOIN types?",
+      "Explain how Amazon S3 ensures data durability"
+    ],
+    "tags": ["DSA", "DBMS", "HR"],
+    "tips": "Intern rounds have 1 behavioral + 2 coding. Leadership Principles — especially Customer Obsession and Deliver Results.",
+    "submittedBy": "Nisha A.",
+    "createdAt": "2025-05-01T10:00:00.000Z"
+  },
+  {
+    "id": "sample_012",
+    "company": "Amazon",
+    "role": "SDE-2",
+    "rounds": 6,
+    "difficulty": 4,
+    "questions": [
+      "Design an inventory management system for Amazon warehouses",
+      "Merge k sorted linked lists",
+      "Tell me about a time you made a decision with incomplete data",
+      "What is two-phase locking in databases?",
+      "Explain SAGA pattern for microservices",
+      "How do you handle retries and idempotency in distributed systems?"
+    ],
+    "tags": ["DSA", "DBMS", "System Design", "HR"],
+    "tips": "SDE-2 bar is high. System design must cover fault tolerance, scaling, and trade-offs. 4 LP stories are minimum.",
+    "submittedBy": "Rohan S.",
+    "createdAt": "2025-06-10T08:30:00.000Z"
+  },
+  {
+    "id": "sample_013",
+    "company": "Microsoft",
+    "role": "SDE-1",
+    "rounds": 4,
+    "difficulty": 4,
+    "questions": [
+      "Design a parking lot system with OOP",
+      "Check if a binary tree is a BST",
+      "What is the difference between a mutex and a semaphore?",
+      "Implement a LRU Cache",
+      "How does Azure handle auto-scaling?"
+    ],
+    "tags": ["DSA", "OS", "System Design"],
+    "tips": "Microsoft SDE-1 includes an extra hiring manager round. Study OOP design patterns and Azure basics for cloud questions.",
+    "submittedBy": "Ananya R.",
+    "createdAt": "2025-03-22T14:00:00.000Z"
+  },
+  {
+    "id": "sample_014",
+    "company": "Microsoft",
+    "role": "Software Engineer II",
+    "rounds": 4,
+    "difficulty": 4,
+    "questions": [
+      "Design a distributed rate limiter",
+      "Number of islands — DFS approach",
+      "Explain SOLID principles with examples",
+      "What is eventual consistency and how does Azure Cosmos DB handle it?"
+    ],
+    "tags": ["DSA", "System Design", "OS"],
+    "tips": "Microsoft loves OOP and design patterns. Revise Observer, Factory, Strategy patterns and be ready to code them.",
+    "submittedBy": "Sameer K.",
+    "createdAt": "2025-07-14T12:00:00.000Z"
+  },
+  {
+    "id": "sample_015",
+    "company": "Meta",
+    "role": "SDE Intern",
+    "rounds": 3,
+    "difficulty": 4,
+    "questions": [
+      "Clone a graph with deep copy",
+      "Design Facebook's News Feed at a high level",
+      "Find all subsets of an array",
+      "What is the difference between REST and gRPC?"
+    ],
+    "tags": ["DSA", "System Design", "CN"],
+    "tips": "Meta interns get real product interviews, not toy problems. Know graph algorithms cold — they love graph and tree problems.",
+    "submittedBy": "Divya M.",
+    "createdAt": "2025-04-07T10:30:00.000Z"
+  },
+  {
+    "id": "sample_016",
+    "company": "Meta",
+    "role": "Production Engineer",
+    "rounds": 4,
+    "difficulty": 4,
+    "questions": [
+      "Debug a system where latency has suddenly spiked — walk through your approach",
+      "Explain how Linux handles memory paging",
+      "Design a distributed key-value store",
+      "Write a bash script to find top 5 error lines in a log file",
+      "What is TCP three-way handshake?"
+    ],
+    "tags": ["OS", "CN", "System Design"],
+    "tips": "PE role is infra-focused. Know Linux deeply — processes, signals, paging, file descriptors. Revise networking layers.",
+    "submittedBy": "Harsh V.",
+    "createdAt": "2025-05-20T09:45:00.000Z"
+  },
+  {
+    "id": "sample_017",
+    "company": "Uber",
+    "role": "Backend Engineer Intern",
+    "rounds": 3,
+    "difficulty": 3,
+    "questions": [
+      "Design a ride-matching algorithm — how do you find the nearest driver?",
+      "Implement Dijkstra's algorithm",
+      "What is geohashing and how does Uber use it?",
+      "Explain the difference between horizontal and vertical scaling"
+    ],
+    "tags": ["DSA", "System Design"],
+    "tips": "Uber backend = geo problems. Know Dijkstra, A* at concept level. Geohashing is almost guaranteed to come up.",
+    "submittedBy": "Pooja L.",
+    "createdAt": "2025-02-25T11:00:00.000Z"
+  },
+  {
+    "id": "sample_018",
+    "company": "Uber",
+    "role": "SDE-1",
+    "rounds": 4,
+    "difficulty": 4,
+    "questions": [
+      "Design Uber's surge pricing engine",
+      "Trapping rain water problem",
+      "What is a circuit breaker pattern in microservices?",
+      "How does Uber handle GPS location updates at scale?",
+      "Explain optimistic vs pessimistic concurrency control"
+    ],
+    "tags": ["DSA", "System Design", "DBMS"],
+    "tips": "Surge pricing and real-time location are favourite system design topics. Know Kafka + Redis for stream processing.",
+    "submittedBy": "Akash N.",
+    "createdAt": "2025-08-03T14:30:00.000Z"
+  },
+  {
+    "id": "sample_019",
+    "company": "Swiggy",
+    "role": "SDE Intern",
+    "rounds": 3,
+    "difficulty": 3,
+    "questions": [
+      "Design a real-time order tracking system",
+      "Find the shortest path in a weighted graph",
+      "What is a webhook and how is it different from polling?",
+      "Explain how you'd structure a food menu API"
+    ],
+    "tags": ["DSA", "System Design", "CN"],
+    "tips": "Swiggy cares about practical backend knowledge. Real-time systems, pub/sub, and REST API design are recurring themes.",
+    "submittedBy": "Tanya S.",
+    "createdAt": "2025-03-18T10:00:00.000Z"
+  },
+  {
+    "id": "sample_020",
+    "company": "Swiggy",
+    "role": "Backend Engineer",
+    "rounds": 4,
+    "difficulty": 4,
+    "questions": [
+      "Design Swiggy's restaurant recommendation engine",
+      "LFU Cache implementation",
+      "How does a CDN work? How would you use it for menu images?",
+      "What is the difference between synchronous and asynchronous messaging?",
+      "Explain database indexing strategies for high-read workloads"
+    ],
+    "tags": ["DSA", "System Design", "DBMS"],
+    "tips": "Swiggy SDE rounds go deep on caching and search. Revise Elasticsearch basics and CDN strategies for content delivery.",
+    "submittedBy": "Manish D.",
+    "createdAt": "2025-09-01T12:00:00.000Z"
+  },
+  {
+    "id": "sample_021",
+    "company": "Zomato",
+    "role": "SDE-1",
+    "rounds": 4,
+    "difficulty": 3,
+    "questions": [
+      "Design a restaurant search with location-based filtering",
+      "How would you handle flash sales on Zomato Gold?",
+      "What is connection pooling in databases?",
+      "Implement a trie for restaurant name autocomplete",
+      "Difference between monolithic and microservice architecture"
+    ],
+    "tags": ["DSA", "System Design", "DBMS"],
+    "tips": "Zomato focuses on product-driven system design. Think about peak hour traffic — Diwali orders, late nights. Mention Redis for caching.",
+    "submittedBy": "Sanya P.",
+    "createdAt": "2025-04-30T09:00:00.000Z"
+  },
+  {
+    "id": "sample_022",
+    "company": "Adobe",
+    "role": "Software Engineer Intern",
+    "rounds": 3,
+    "difficulty": 3,
+    "questions": [
+      "Design a photo editing undo/redo system using stacks",
+      "What are design patterns? Explain Command pattern",
+      "Find the kth largest element in a stream",
+      "Explain how PNG compression works conceptually"
+    ],
+    "tags": ["DSA", "System Design"],
+    "tips": "Adobe interviews are OOP-heavy. Know Command, Observer, and Strategy patterns inside out. Undo/redo stack question is classic.",
+    "submittedBy": "Kartik J.",
+    "createdAt": "2025-05-08T10:00:00.000Z"
+  },
+  {
+    "id": "sample_023",
+    "company": "Adobe",
+    "role": "SDE-1",
+    "rounds": 4,
+    "difficulty": 3,
+    "questions": [
+      "Design a real-time collaborative document editor",
+      "Rotate an image 90 degrees in-place",
+      "Explain dependency injection and inversion of control",
+      "What is a thread pool and why is it used?"
+    ],
+    "tags": ["DSA", "OS", "System Design"],
+    "tips": "Adobe loves clean code and design principles. Walk through your OOP design before coding — they value thought process.",
+    "submittedBy": "Neha R.",
+    "createdAt": "2025-06-22T11:30:00.000Z"
+  },
+  {
+    "id": "sample_024",
+    "company": "Razorpay",
+    "role": "SDE Intern",
+    "rounds": 3,
+    "difficulty": 3,
+    "questions": [
+      "How does a payment gateway work end-to-end?",
+      "Implement rate limiting for an API — design and code",
+      "What is idempotency? Why is it critical in payments?",
+      "Design a webhook retry system"
+    ],
+    "tags": ["System Design", "CN"],
+    "tips": "Razorpay expects you to understand fintech concepts. Idempotency, retries, and distributed transactions are must-knows.",
+    "submittedBy": "Ayush M.",
+    "createdAt": "2025-07-11T09:00:00.000Z"
+  },
+  {
+    "id": "sample_025",
+    "company": "Paytm",
+    "role": "Backend Engineer Intern",
+    "rounds": 3,
+    "difficulty": 3,
+    "questions": [
+      "Design a digital wallet system — handle concurrent debit/credit",
+      "What is ACID compliance? Why does it matter for payments?",
+      "Explain optimistic locking with an example",
+      "Find duplicate transactions in a stream"
+    ],
+    "tags": ["System Design", "DBMS"],
+    "tips": "Payments = ACID. Understand transactions, isolation levels, and rollback. Race conditions in wallet ops is a very common topic.",
+    "submittedBy": "Riya G.",
+    "createdAt": "2025-08-14T10:30:00.000Z"
+  },
+  {
+    "id": "sample_026",
+    "company": "Goldman Sachs",
+    "role": "Technology Analyst",
+    "rounds": 4,
+    "difficulty": 4,
+    "questions": [
+      "Explain how a stock exchange matching engine works",
+      "What are the SOLID principles?",
+      "Design a system to detect fraud in real time",
+      "Implement a thread-safe singleton pattern",
+      "What is the difference between a stack and a heap in memory?"
+    ],
+    "tags": ["DSA", "OS", "System Design"],
+    "tips": "GS tech is much harder than the role title suggests. Strong OS concepts — concurrency, threads, synchronization. On-campus bar is very high.",
+    "submittedBy": "Parth M.",
+    "createdAt": "2025-09-10T08:00:00.000Z"
+  },
+  {
+    "id": "sample_027",
+    "company": "JP Morgan",
+    "role": "Software Engineer Intern",
+    "rounds": 3,
+    "difficulty": 3,
+    "questions": [
+      "What is a REST API? Build a small one mentally",
+      "Explain ACID properties with banking examples",
+      "Implement binary search on a rotated sorted array",
+      "What is two-factor authentication and how is it implemented?"
+    ],
+    "tags": ["DSA", "DBMS", "CN"],
+    "tips": "JP Morgan intern rounds are moderate. Know REST, ACID, and banking-specific system design. Cybersecurity basics help.",
+    "submittedBy": "Snehal B.",
+    "createdAt": "2025-10-01T09:30:00.000Z"
+  },
+  {
+    "id": "sample_028",
+    "company": "Infosys",
+    "role": "Senior Systems Engineer",
+    "rounds": 3,
+    "difficulty": 2,
+    "questions": [
+      "Explain microservices and when to use them",
+      "What are SOLID principles?",
+      "Write a SQL query to find the second highest salary",
+      "Explain the concept of a REST API with an example",
+      "What is Docker and why is it used?"
+    ],
+    "tags": ["DBMS", "System Design"],
+    "tips": "Infosys lateral interviews go slightly deeper than fresher. Know Docker basics, REST, and SQL aggregation queries.",
+    "submittedBy": "Smita V.",
+    "createdAt": "2025-02-15T10:00:00.000Z"
+  },
+  {
+    "id": "sample_029",
+    "company": "Wipro",
+    "role": "Senior Software Engineer",
+    "rounds": 3,
+    "difficulty": 2,
+    "questions": [
+      "Explain the MVC architecture pattern",
+      "What is a RESTful API — name its constraints",
+      "Difference between TCP and UDP",
+      "Write a query to find duplicate rows in a table"
+    ],
+    "tags": ["DBMS", "CN", "System Design"],
+    "tips": "Wipro lateral rounds include one technical deep-dive. REST and MVC are favourite topics. Revise basic networking.",
+    "submittedBy": "Nikhil R.",
+    "createdAt": "2025-03-01T11:00:00.000Z"
+  },
+  {
+    "id": "sample_030",
+    "company": "Flipkart",
+    "role": "SDE Intern",
+    "rounds": 3,
+    "difficulty": 3,
+    "questions": [
+      "Design Flipkart's product search with filters",
+      "Top K frequent elements in an array",
+      "What is an inverted index? How does search work?",
+      "Explain how you'd handle a flash sale with millions of concurrent users"
+    ],
+    "tags": ["DSA", "System Design"],
+    "tips": "Flipkart loves e-commerce scenarios. Flash sale concurrency + inverted index search are classic. Know Redis and Elasticsearch at a concept level.",
+    "submittedBy": "Simran K.",
+    "createdAt": "2025-04-22T10:00:00.000Z"
+  },
+  {
+    "id": "sample_031",
+    "company": "TCS",
+    "role": "Digital Specialist Engineer",
+    "rounds": 3,
+    "difficulty": 2,
+    "questions": [
+      "Explain the OSI model with examples at each layer",
+      "What is a primary key vs a foreign key?",
+      "Write a Java program to reverse a string without built-in methods",
+      "What is Agile methodology?"
+    ],
+    "tags": ["CN", "DBMS", "HR"],
+    "tips": "TCS Digital requires stronger coding than regular NQT. Practice basic string and array programs. Aptitude is still a big filter.",
+    "submittedBy": "Rahul N.",
+    "createdAt": "2025-01-18T09:00:00.000Z"
+  },
+  {
+    "id": "sample_032",
+    "company": "Salesforce",
+    "role": "Associate Software Engineer",
+    "rounds": 4,
+    "difficulty": 3,
+    "questions": [
+      "Design a CRM system schema at the DB level",
+      "What is a governor limit in Salesforce Apex?",
+      "Implement merge intervals",
+      "Explain REST API versioning strategies",
+      "What is OAuth 2.0 and how does it work?"
+    ],
+    "tags": ["DSA", "DBMS", "CN"],
+    "tips": "Salesforce blends cloud platform knowledge with core CS. Know REST deeply — auth flows, versioning, rate limiting.",
+    "submittedBy": "Preethi J.",
+    "createdAt": "2025-07-05T10:30:00.000Z"
   }
 ]

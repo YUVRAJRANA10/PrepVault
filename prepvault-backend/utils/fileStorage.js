@@ -8,7 +8,6 @@ async function readExperiences() {
     const data = await fs.readFile(DATA_FILE, 'utf-8');
     const experiences = JSON.parse(data);
     return experiences;
-    
 }
 
 async function saveExperiences(data) {

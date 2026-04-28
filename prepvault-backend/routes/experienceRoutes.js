@@ -10,6 +10,6 @@ router.post('/',validateExperience,createExperience)
 router.put('/:id',validateExperience,updateExperience)
 router.delete('/:id',deleteExperience)
 
-module.exports = router
+module.exports = routerm
 
 
