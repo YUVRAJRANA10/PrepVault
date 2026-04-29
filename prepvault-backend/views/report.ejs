@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PrepVault Admin Report</title>
+    <style>
+      body { font-family: system-ui, Arial; padding: 24px; background: #0b0b13; color: #e6e6e6 }
+      .card { background: #0f1220; padding: 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04); max-width: 520px }
+      h1 { color: #f3c06b }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>PrepVault Report</h1>
+      <p>Total experiences: <strong><%= stats.expCount %></strong></p>
+      <p>Total users: <strong><%= stats.userCount %></strong></p>
+    </div>
+    <div style="margin-top:18px; max-width:960px">
+      <h2>Recent experiences</h2>
+      <div>
+        <% const exps = stats.exps || [] %>
+        <% if (exps.length === 0) { %>
+          <p class="muted">No experiences yet.</p>
+        <% } else { %>
+          <table style="width:100%; border-collapse:collapse; margin-top:12px">
+            <thead>
+              <tr style="text-align:left; border-bottom:1px solid rgba(255,255,255,0.06)">
+                <th>Company</th><th>Role</th><th>By</th><th>Created</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+            <% for (let e of exps) { %>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.03)">
+                <td><%= e.company %></td>
+                <td><%= e.role %></td>
+                <td><%= e.submittedBy %></td>
+                <td><%= new Date(e.createdAt).toLocaleString() %></td>
+                <td>
+                  <form method="POST" action="/admin/experiences/<%= e._id %>/delete" style="display:inline">
+                    <button type="submit" style="background:#ff5c5c;border:none;padding:6px 8px;border-radius:4px;color:#111;">Delete</button>
+                  </form>
+                  <form method="POST" action="/admin/experiences/<%= e._id %>/flag" style="display:inline;margin-left:8px">
+                    <button type="submit" style="background:#ffc857;border:none;padding:6px 8px;border-radius:4px;color:#111;">Flag</button>
+                  </form>
+                </td>
+              </tr>
+            <% } %>
+            </tbody>
+          </table>
+        <% } %>
+      </div>
+    </div>
+  </body>
+</html>

@@ -20,6 +20,7 @@ function CompanyInitial({ name }) {
 
 export default function ExperienceCard({ experience, onClick, isFav, onToggleFav }) {
   const { company, role, difficulty, questions = [], tags = [], tips, submittedBy } = experience
+  const expId = experience._id || experience.id
 
   return (
     <motion.div
@@ -40,7 +41,7 @@ export default function ExperienceCard({ experience, onClick, isFav, onToggleFav
           </span>
           <button
             className={`fav-btn ${isFav ? 'active' : ''}`}
-            onClick={e => { e.stopPropagation(); onToggleFav && onToggleFav(experience.id) }}
+            onClick={e => { e.stopPropagation(); onToggleFav && onToggleFav(expId) }}
             title={isFav ? 'Remove from saved' : 'Save'}
           >
             {isFav ? '♥' : '♡'}

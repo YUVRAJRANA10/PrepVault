@@ -1,78 +1,73 @@
-const fileStorage = require('../utils/fileStorage.js')
+const Experience = require('../models/Experience')
 
-
-async function getAllExperiences(req,res){
-    const data = await fileStorage.readExperiences();
-    res.json(data)
+async function getAllExperiences(req, res) {
+  const data = await Experience.find().sort({ createdAt: -1 }).lean()
+  res.json(data)
 }
 
+async function createExperience(req, res) {
+  const { company, role, difficulty, questions } = req.body
+  // Support multipart/form-data (attachments) and JSON bodies
+  const attachments = []
+  if (req.files && req.files.length) {
+    for (const f of req.files) {
+      attachments.push({ filename: f.originalname, url: `/uploads/${f.filename}`, mime: f.mimetype })
+    }
+  }
 
-async function createExperience(req,res){
-   const data = await fileStorage.readExperiences();
-   const { company, role, difficulty, questions } = req.body
-
-   const newexperience = {
-    id: Date.now().toString(),
-    company: company,
-    role: role,
-    difficulty: difficulty,
-    questions: questions,
+  const doc = new Experience({
+    company,
+    role,
+    difficulty,
+    questions,
     rounds: req.body.rounds || 1,
     tags: req.body.tags || [],
     tips: req.body.tips || '',
-    submittedBy: req.body.submittedBy || 'Anonymous',
-    createdAt: new Date().toISOString()
-   }
-   data.push(newexperience);
-   
-   await fileStorage.saveExperiences(data)
+    notes: req.body.notes || '',
+    links: req.body.links ? JSON.parse(req.body.links) : (req.body.links || []),
+    resources: req.body.resources ? JSON.parse(req.body.resources) : (req.body.resources || []),
+    checklist: req.body.checklist ? JSON.parse(req.body.checklist) : (req.body.checklist || []),
+    attachments,
+    submittedBy: (req.user && req.user.name) || req.body.submittedBy || 'Anonymous'
+  })
+  await doc.save()
 
-  res.status(201).json({ success: true, data: newexperience })
+  // Emit socket event if available
+  try {
+    const socketHelper = require('../socket')
+    const io = socketHelper.getIO()
+    io.emit('new-experience', doc)
+  } catch (err) {
+    // socket may not be initialized in some environments — ignore silently
+  }
+
+  res.status(201).json({ success: true, data: doc })
 }
-
-
-
 
 async function updateExperience(req, res) {
-  const data = await fileStorage.readExperiences()
-
   const { id } = req.params
-
-  const index = data.findIndex(e => e.id === id)
-  if (index === -1) {
-    return res.status(404).json({ success: false, message: 'Experience not found' })
+  // allow array/stringified JSON fields in multipart requests
+  const updatePayload = { ...req.body }
+  if (req.body.links && typeof req.body.links === 'string') {
+    try { updatePayload.links = JSON.parse(req.body.links) } catch (e) {}
+  }
+  if (req.body.resources && typeof req.body.resources === 'string') {
+    try { updatePayload.resources = JSON.parse(req.body.resources) } catch (e) {}
+  }
+  if (req.body.checklist && typeof req.body.checklist === 'string') {
+    try { updatePayload.checklist = JSON.parse(req.body.checklist) } catch (e) {}
   }
 
-  data[index] = { ...data[index], ...req.body } // keep old fields, overwrite with new ones
-
-  await fileStorage.saveExperiences(data)
-  res.json({ success: true, data: data[index] })
+  const updated = await Experience.findByIdAndUpdate(id, updatePayload, { new: true, runValidators: true }).lean()
+  if (!updated) return res.status(404).json({ success: false, message: 'Experience not found' })
+  res.json({ success: true, data: updated })
 }
 
-
-
 async function deleteExperience(req, res) {
-  const data = await fileStorage.readExperiences()
-
   const { id } = req.params
-
-  const index = data.findIndex(e => e.id === id)
-  if (index === -1) {
-    return res.status(404).json({ success: false, message: 'Experience not found' })
-  }
-
-  const deleted = data[index]      // save it before removing
-  data.splice(index, 1)
-
-  await fileStorage.saveExperiences(data)
+  const deleted = await Experience.findByIdAndDelete(id).lean()
+  if (!deleted) return res.status(404).json({ success: false, message: 'Experience not found' })
   res.json({ success: true, data: deleted })
 }
 
-
-
-module.exports = {
-  getAllExperiences,
-  createExperience,
-  updateExperience,
-  deleteExperience
-}
+module.exports = { getAllExperiences, createExperience, updateExperience, deleteExperience }

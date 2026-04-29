@@ -1,0 +1,60 @@
+{
+  "info": {
+    "name": "PrepVault API - Sample",
+    "_postman_id": "prepvault-sample",
+    "description": "Basic flows: register, login, create experience, list, toggle favorite, get profile",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"name\": \"Test User\", \"email\": \"testuser@example.com\", \"password\": \"TestPass123\" }" },
+        "url": { "raw": "http://localhost:5000/api/auth/register", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api","auth","register"] }
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{ \"email\": \"testuser@example.com\", \"password\": \"TestPass123\" }" },
+        "url": { "raw": "http://localhost:5000/api/auth/login", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api","auth","login"] }
+      }
+    },
+    {
+      "name": "Get Experiences",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://localhost:5000/api/experiences", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api","experiences"] }
+      }
+    },
+    {
+      "name": "Create Experience (requires Authorization)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+        "body": { "mode": "raw", "raw": "{ \"company\": \"DemoCorp\", \"role\": \"SDE\", \"rounds\": 2, \"difficulty\": 3, \"questions\": [\"What is closure?\"], \"tags\": [\"DSA\"] }" },
+        "url": { "raw": "http://localhost:5000/api/experiences", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api","experiences"] }
+      }
+    },
+    {
+      "name": "Toggle Favorite (requires Authorization)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+        "url": { "raw": "http://localhost:5000/api/users/favorites/{{expId}}", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api","users","favorites","{{expId}}"] }
+      }
+    },
+    {
+      "name": "Get Profile (requires Authorization)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+        "url": { "raw": "http://localhost:5000/api/users/me", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api","users","me"] }
+      }
+    }
+  ]
+}

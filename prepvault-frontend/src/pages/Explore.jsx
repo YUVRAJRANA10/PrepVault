@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import ExperienceCard from '../components/ExperienceCard'
 import AddExperienceModal from '../components/AddExperienceModal'
 import ExperienceDrawer from '../components/ExperienceDrawer'
-import { getExperiences } from '../api'
-
-const FAVS_KEY = 'prepvault_favs'
+import { getAuthToken, getExperiences, toggleFavorite, getMe } from '../api'
+import socket from '../utils/socket'
 
 const DIFFICULTIES = ['All', 'Easy', 'Medium', 'Hard']
 
@@ -18,6 +17,7 @@ function difficultyMatch(difficulty, filter) {
 }
 
 export default function Explore() {
+  const navigate = useNavigate()
   const [experiences, setExperiences] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -26,16 +26,28 @@ export default function Explore() {
   const [showModal, setShowModal] = useState(false)
   const [selected, setSelected] = useState(null)
   const [showFavsOnly, setShowFavsOnly] = useState(false)
-  const [favorites, setFavorites] = useState(() =>
-    JSON.parse(localStorage.getItem(FAVS_KEY) || '[]')
-  )
+  const [favorites, setFavorites] = useState([])
+  const [toast, setToast] = useState(null)
   const [searchParams] = useSearchParams()
+
+  const getExpId = (exp) => exp._id || exp.id
 
   const fetchData = async () => {
     setLoading(true)
     try {
       const res = await getExperiences()
       setExperiences(res.data)
+      
+      // Load user's saved favorites from DB if logged in
+      if (getAuthToken()) {
+        try {
+          const userRes = await getMe()
+          const favIds = userRes.data.data.savedFavorites?.map(f => f._id || f) || []
+          setFavorites(favIds)
+        } catch (err) {
+          console.warn('Failed to load user favorites:', err)
+        }
+      }
     } catch (e) {
       console.error(e)
     } finally {
@@ -46,16 +58,37 @@ export default function Explore() {
   useEffect(() => {
     fetchData()
     if (searchParams.get('company')) setSelectedCompany(searchParams.get('company'))
+    // listen for realtime new experiences
+    socket.on('new-experience', (exp) => {
+      setExperiences(prev => [exp, ...prev])
+      setToast({ message: `New experience: ${exp.company} - ${exp.role}`, expId: exp._id || exp.id })
+      // auto-dismiss
+      setTimeout(() => setToast(null), 6000)
+    })
+    return () => socket.off('new-experience')
   }, [])
 
   const companies = ['All', ...new Set(experiences.map(e => e.company))]
 
-  const toggleFav = (id) => {
-    setFavorites(prev => {
-      const next = prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
-      localStorage.setItem(FAVS_KEY, JSON.stringify(next))
-      return next
-    })
+  const toggleFav = async (id) => {
+    if (!getAuthToken()) {
+      navigate('/login')
+      return
+    }
+    
+    try {
+      await toggleFavorite(id)
+      setFavorites(prev => {
+        const idx = prev.indexOf(id)
+        if (idx > -1) {
+          return prev.filter((_, i) => i !== idx)
+        } else {
+          return [...prev, id]
+        }
+      })
+    } catch (err) {
+      console.error('Failed to toggle favorite:', err)
+    }
   }
 
   const filtered = experiences.filter(e => {
@@ -65,7 +98,7 @@ export default function Explore() {
       || e.questions?.some(qs => qs.toLowerCase().includes(q))
     const matchCompany = selectedCompany === 'All' || e.company === selectedCompany
     const matchDiff = difficultyMatch(e.difficulty, selectedDiff)
-    const matchFav = !showFavsOnly || favorites.includes(e.id)
+    const matchFav = !showFavsOnly || favorites.includes(getExpId(e))
     return matchSearch && matchCompany && matchDiff && matchFav
   })
 
@@ -170,13 +203,13 @@ export default function Explore() {
         >
           {filtered.map(exp => (
             <motion.div
-              key={exp.id}
+              key={getExpId(exp)}
               variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
             >
               <ExperienceCard
                 experience={exp}
                 onClick={setSelected}
-                isFav={favorites.includes(exp.id)}
+                isFav={favorites.includes(getExpId(exp))}
                 onToggleFav={toggleFav}
               />
             </motion.div>
@@ -189,7 +222,7 @@ export default function Explore() {
         {selected && (
           <ExperienceDrawer
             experience={selected}
-            isFav={favorites.includes(selected.id)}
+            isFav={favorites.includes(getExpId(selected))}
             onToggleFav={toggleFav}
             onClose={() => setSelected(null)}
           />
@@ -199,7 +232,13 @@ export default function Explore() {
       {/* Floating Add Button */}
       <motion.button
         className="fab"
-        onClick={() => setShowModal(true)}
+        onClick={() => {
+          if (!getAuthToken()) {
+            navigate('/login')
+            return
+          }
+          setShowModal(true)
+        }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         title="Share your experience"
@@ -212,6 +251,14 @@ export default function Explore() {
           onClose={() => setShowModal(false)}
           onAdded={fetchData}
         />
+      )}
+      {toast && (
+        <div className="socket-toast" onClick={() => {
+          if (toast.expId) setSelected(experiences.find(e => (e._id || e.id) === toast.expId))
+          setToast(null)
+        }}>
+          {toast.message} — click to open
+        </div>
       )}
     </main>
   )

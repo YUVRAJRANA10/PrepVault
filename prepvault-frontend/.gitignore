@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Ignore build artifacts from backend uploads when working from frontend workspace
+../prepvault-backend/public/uploads/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

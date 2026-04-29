@@ -20,6 +20,7 @@ function DiffBar({ value }) {
 export default function ExperienceDrawer({ experience, isFav, onToggleFav, onClose }) {
   if (!experience) return null
   const { company, role, difficulty, questions = [], tags = [], tips, submittedBy, rounds, createdAt } = experience
+  const expId = experience._id || experience.id
 
   const date = createdAt ? new Date(createdAt).toLocaleDateString('en-IN', {
     day: 'numeric', month: 'short', year: 'numeric'
@@ -91,7 +92,7 @@ export default function ExperienceDrawer({ experience, isFav, onToggleFav, onClo
           <div className="exp-modal-actions">
             <button
               className={`fav-btn-large ${isFav ? 'active' : ''}`}
-              onClick={() => onToggleFav(experience.id)}
+              onClick={() => onToggleFav(expId)}
             >
               {isFav ? '♥ Saved' : '♡ Save'}
             </button>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createExperience } from '../api'
+import { useNavigate } from 'react-router-dom'
 
 const AVAILABLE_TAGS = ['DSA', 'DBMS', 'OS', 'CN', 'HR']
 
@@ -10,12 +11,18 @@ const EMPTY_FORM = {
 }
 
 export default function AddExperienceModal({ onClose, onAdded }) {
+  const navigate = useNavigate()
   const [form, setForm] = useState(EMPTY_FORM)
+  const [file, setFile] = useState(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleFile = (e) => {
+    setFile(e.target.files[0] || null)
   }
 
   const toggleTag = (tag) => {
@@ -38,19 +45,39 @@ export default function AddExperienceModal({ onClose, onAdded }) {
       .filter(q => q.length > 0)
 
     try {
-      await createExperience({
-        company: form.company,
-        role: form.role,
-        rounds: Number(form.rounds) || 1,
-        difficulty: Number(form.difficulty),
-        questions: questionsArray,
-        tags: form.tags,
-        tips: form.tips,
-        submittedBy: form.submittedBy.trim() || 'Anonymous'
-      })
+      // if a file is attached, send as FormData
+      if (file) {
+        const fd = new FormData()
+        fd.append('company', form.company)
+        fd.append('role', form.role)
+        fd.append('rounds', Number(form.rounds) || 1)
+        fd.append('difficulty', Number(form.difficulty))
+        fd.append('questions', JSON.stringify(questionsArray))
+        fd.append('tags', JSON.stringify(form.tags))
+        fd.append('tips', form.tips)
+        fd.append('submittedBy', form.submittedBy.trim() || 'Anonymous')
+        fd.append('attachments', file)
+        await createExperience(fd)
+      } else {
+        await createExperience({
+          company: form.company,
+          role: form.role,
+          rounds: Number(form.rounds) || 1,
+          difficulty: Number(form.difficulty),
+          questions: questionsArray,
+          tags: form.tags,
+          tips: form.tips,
+          submittedBy: form.submittedBy.trim() || 'Anonymous'
+        })
+      }
       onAdded()
       onClose()
     } catch (err) {
+      if (err.response?.status === 401) {
+        setError('Please login first to submit an experience')
+        setTimeout(() => navigate('/login'), 800)
+        return
+      }
       setError(err.response?.data?.message || 'Something went wrong')
     } finally {
       setLoading(false)
@@ -132,6 +159,11 @@ export default function AddExperienceModal({ onClose, onAdded }) {
               <label>Preparation Tips</label>
               <textarea name="tips" value={form.tips} onChange={handleChange}
                 placeholder="What helped you prepare..." rows={3} />
+            </div>
+
+            <div className="form-group">
+              <label>Attachment (optional)</label>
+              <input type="file" name="attachment" onChange={handleFile} />
             </div>
 
             <div className="form-group">
