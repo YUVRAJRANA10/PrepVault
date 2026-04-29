@@ -104,90 +104,101 @@ export default function VaultHero() {
 
   return (
     <section className="hero">
+      <div className="hero-orbs hero-orb-a" />
+      <div className="hero-orbs hero-orb-b" />
+      <div className="hero-orbs hero-orb-c" />
+
       <motion.div
         className="hero-text"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
       >
-        <p className="hero-eyebrow">Interview Experiences · Real People · Real Companies</p>
+        <p className="hero-eyebrow">Interview stories · Shared by the community</p>
         <h1 className="hero-title">
           Every interview<br />has a story.<br />
           <span className="gold">Find yours.</span>
         </h1>
         <p className="hero-sub">
-          Browse real experiences shared by students and professionals.<br />
-          Know what to expect before you walk in.
+          Explore real interview stories, saved tips, and interview notes from people who have already been there.
         </p>
+        <div className="hero-badges">
+          <span>Fresh stories</span>
+          <span>Saved favorites</span>
+          <span>Helpful notes</span>
+        </div>
       </motion.div>
 
       <motion.div
+        className="hero-art"
         initial={{ opacity: 0, scale: 0.85 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        style={{ position: 'relative' }}
       >
-        {/* Company logos burst outward from vault center */}
-        <CompanyBurst />
+        <div className="hero-art-stage">
+          {/* Company logos burst outward from vault center */}
+          <CompanyBurst />
 
-        {/* 
-          Hover zone is a STATIC div — it never moves.
-          Only the inner door animates with rotateY.
-          This prevents the flapping loop where rotating away triggers onHoverEnd.
-        */}
-        <div
-          className="vault-scene"
-          style={{ perspective: '1200px', position: 'relative', zIndex: 1 }}
-          onMouseEnter={() => setIsOpen(true)}
-          onMouseLeave={() => setIsOpen(false)}
-          onClick={() => navigate('/explore')}
-        >
-          {/* Behind the door — always visible */}
-          <div className={`vault-reveal${isOpen ? ' open' : ''}`}>
-            <div className="vault-reveal-inner">
-              {/* Animated SVG padlock — shackle lifts when vault opens */}
-              <svg className="vault-svg-lock" width="46" height="54" viewBox="0 0 46 54" fill="none">
-                {/* Body */}
-                <rect x="2" y="24" width="42" height="28" rx="5" fill="#0a0a1e" stroke="#c89b3c" strokeWidth="2.5" />
-                {/* Inner body accent */}
-                <rect x="6" y="28" width="34" height="20" rx="2" fill="none" stroke="#c89b3c" strokeWidth="0.7" opacity="0.28" />
-                {/* Keyhole */}
-                <circle cx="23" cy="36" r="5" fill="#c89b3c" />
-                <path d="M20.5 39 L20.5 47 L25.5 47 L25.5 39 Z" fill="#c89b3c" />
-                {/* Shackle — translates up and fades when open */}
-                <motion.g
-                  animate={isOpen ? { y: -13, opacity: 0 } : { y: 0, opacity: 1 }}
-                  transition={{ duration: 0.38, delay: isOpen ? 0.3 : 0, ease: 'easeInOut' }}
-                >
-                  <path
-                    d="M12 24 L12 14 A11 11 0 0 1 34 14 L34 24"
-                    stroke="#c89b3c" strokeWidth="4.5" strokeLinecap="round" fill="none"
-                  />
-                </motion.g>
-              </svg>
-              <motion.span
-                className="vault-unlock-text"
-                animate={
-                  isOpen
-                    ? { opacity: 1, letterSpacing: '0.22em', color: '#f2c96a' }
-                    : { opacity: 0.6, letterSpacing: '0.08em', color: '#c89b3c' }
-                }
-                transition={{ duration: 0.38 }}
-              >
-                Enter the Vault
-              </motion.span>
-            </div>
-          </div>
-
-          {/* Animated door — rotates away on hover, hover detection stays on parent */}
-          <motion.div
-            className="vault-door-wrap"
-            animate={{ rotateY: isOpen ? -145 : 0 }}
-            transition={{ duration: 0.9, ease: [0.23, 1, 0.32, 1], delay: isOpen ? 0.28 : 0 }}
-            style={{ transformOrigin: 'left center', cursor: 'pointer', backfaceVisibility: 'hidden' }}
+          {/* 
+            Hover zone is a STATIC div — it never moves.
+            Only the inner door animates with rotateY.
+            This prevents the flapping loop where rotating away triggers onHoverEnd.
+          */}
+          <div
+            className="vault-scene"
+            style={{ perspective: '1200px', position: 'relative', zIndex: 2 }}
+            onMouseEnter={() => setIsOpen(true)}
+            onMouseLeave={() => setIsOpen(false)}
+            onClick={() => navigate('/explore')}
           >
-            <VaultDoor isOpen={isOpen} />
-          </motion.div>
+            <div className="vault-shell" />
+            {/* Behind the door — always visible */}
+            <div className={`vault-reveal${isOpen ? ' open' : ''}`}>
+              <div className="vault-reveal-inner">
+                {/* Animated SVG padlock — shackle lifts when vault opens */}
+                <svg className="vault-svg-lock" width="46" height="54" viewBox="0 0 46 54" fill="none">
+                  {/* Body */}
+                  <rect x="2" y="24" width="42" height="28" rx="5" fill="#0a0a1e" stroke="#c89b3c" strokeWidth="2.5" />
+                  {/* Inner body accent */}
+                  <rect x="6" y="28" width="34" height="20" rx="2" fill="none" stroke="#c89b3c" strokeWidth="0.7" opacity="0.28" />
+                  {/* Keyhole */}
+                  <circle cx="23" cy="36" r="5" fill="#c89b3c" />
+                  <path d="M20.5 39 L20.5 47 L25.5 47 L25.5 39 Z" fill="#c89b3c" />
+                  {/* Shackle — translates up and fades when open */}
+                  <motion.g
+                    animate={isOpen ? { y: -13, opacity: 0 } : { y: 0, opacity: 1 }}
+                    transition={{ duration: 0.38, delay: isOpen ? 0.3 : 0, ease: 'easeInOut' }}
+                  >
+                    <path
+                      d="M12 24 L12 14 A11 11 0 0 1 34 14 L34 24"
+                      stroke="#c89b3c" strokeWidth="4.5" strokeLinecap="round" fill="none"
+                    />
+                  </motion.g>
+                </svg>
+                <motion.span
+                  className="vault-unlock-text"
+                  animate={
+                    isOpen
+                      ? { opacity: 1, letterSpacing: '0.22em', color: '#f2c96a' }
+                      : { opacity: 0.6, letterSpacing: '0.08em', color: '#c89b3c' }
+                  }
+                  transition={{ duration: 0.38 }}
+                >
+                  Enter the Vault
+                </motion.span>
+              </div>
+            </div>
+
+            {/* Animated door — rotates away on hover, hover detection stays on parent */}
+            <motion.div
+              className="vault-door-wrap"
+              animate={{ rotateY: isOpen ? -145 : 0 }}
+              transition={{ duration: 0.9, ease: [0.23, 1, 0.32, 1], delay: isOpen ? 0.28 : 0 }}
+              style={{ transformOrigin: 'left center', cursor: 'pointer', backfaceVisibility: 'hidden' }}
+            >
+              <VaultDoor isOpen={isOpen} />
+            </motion.div>
+          </div>
         </div>
       </motion.div>
 
@@ -204,6 +215,24 @@ export default function VaultHero() {
           Share Your Story →
         </button>
       </motion.div>
+
+      <div className="hero-trust-row">
+        <div className="trust-card">
+          <span className="trust-kicker">Fresh</span>
+          <strong>New stories appear instantly</strong>
+          <p>Latest interview experiences show up the moment someone shares them.</p>
+        </div>
+        <div className="trust-card">
+          <span className="trust-kicker">Admin tools</span>
+          <strong>Quick review page</strong>
+          <p>Moderate, flag, or remove entries from a fast server-rendered report view.</p>
+        </div>
+        <div className="trust-card">
+          <span className="trust-kicker">Rich content</span>
+          <strong>Notes, files, and comments</strong>
+          <p>Each story can carry attachments, comments, upvotes, and practical interview notes.</p>
+        </div>
+      </div>
     </section>
   )
 }

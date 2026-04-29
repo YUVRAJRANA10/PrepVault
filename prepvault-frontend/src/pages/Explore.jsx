@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import ExperienceCard from '../components/ExperienceCard'
@@ -29,6 +29,7 @@ export default function Explore() {
   const [favorites, setFavorites] = useState([])
   const [toast, setToast] = useState(null)
   const [searchParams] = useSearchParams()
+  const selectedRef = useRef(null)
 
   const getExpId = (exp) => exp._id || exp.id
 
@@ -58,15 +59,43 @@ export default function Explore() {
   useEffect(() => {
     fetchData()
     if (searchParams.get('company')) setSelectedCompany(searchParams.get('company'))
-    // listen for realtime new experiences
+    let toastTimer = null
+
+    const upsertExperience = (incoming) => {
+      setExperiences(prev => {
+        const incomingId = getExpId(incoming)
+        const existingIndex = prev.findIndex(item => getExpId(item) === incomingId)
+        if (existingIndex === -1) return [incoming, ...prev]
+        const next = [...prev]
+        next[existingIndex] = { ...next[existingIndex], ...incoming }
+        return next
+      })
+    }
+
     socket.on('new-experience', (exp) => {
-      setExperiences(prev => [exp, ...prev])
+      upsertExperience(exp)
       setToast({ message: `New experience: ${exp.company} - ${exp.role}`, expId: exp._id || exp.id })
-      // auto-dismiss
-      setTimeout(() => setToast(null), 6000)
+      if (toastTimer) clearTimeout(toastTimer)
+      toastTimer = setTimeout(() => setToast(null), 6000)
     })
-    return () => socket.off('new-experience')
+
+    socket.on('experience-updated', (exp) => {
+      upsertExperience(exp)
+      if (selectedRef.current && getExpId(selectedRef.current) === getExpId(exp)) {
+        setSelected(prev => ({ ...prev, ...exp }))
+      }
+    })
+
+    return () => {
+      socket.off('new-experience')
+      socket.off('experience-updated')
+      if (toastTimer) clearTimeout(toastTimer)
+    }
   }, [])
+
+  useEffect(() => {
+    selectedRef.current = selected
+  }, [selected])
 
   const companies = ['All', ...new Set(experiences.map(e => e.company))]
 

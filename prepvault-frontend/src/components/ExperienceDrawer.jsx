@@ -20,14 +20,16 @@ function DiffBar({ value }) {
 }
 
 export default function ExperienceDrawer({ experience, isFav, onToggleFav, onClose }) {
-  if (!experience) return null
   const [localExp, setLocalExp] = useState(experience)
   const [commentText, setCommentText] = useState('')
   const [submittingComment, setSubmittingComment] = useState(false)
-  const { company, role, difficulty, questions = [], tags = [], tips, submittedBy, rounds, createdAt } = localExp
-  const expId = localExp._id || localExp.id
 
   useEffect(() => setLocalExp(experience), [experience])
+
+  if (!experience || !localExp) return null
+
+  const { company, role, difficulty, questions = [], tags = [], tips, submittedBy, rounds, createdAt } = localExp
+  const expId = localExp._id || localExp.id
 
   const date = createdAt ? new Date(createdAt).toLocaleDateString('en-IN', {
     day: 'numeric', month: 'short', year: 'numeric'

@@ -19,7 +19,7 @@ function CompanyInitial({ name }) {
 }
 
 export default function ExperienceCard({ experience, onClick, isFav, onToggleFav }) {
-  const { company, role, difficulty, questions = [], tags = [], tips, submittedBy } = experience
+  const { company, role, difficulty, questions = [], tags = [], tips, submittedBy, upvotes = 0, attachments = [] } = experience
   const expId = experience._id || experience.id
 
   return (
@@ -76,6 +76,10 @@ export default function ExperienceCard({ experience, onClick, isFav, onToggleFav
             <p className="card-author">by {submittedBy}</p>
           )}
           {tips && <p className="card-tip">💡 {tips.slice(0, 55)}{tips.length > 55 ? '...' : ''}</p>}
+        </div>
+        <div className="card-metrics">
+          <span>⬆ {upvotes}</span>
+          <span>📎 {attachments.length}</span>
         </div>
       </div>
     </motion.div>

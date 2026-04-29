@@ -28,7 +28,9 @@ export default function Navbar() {
       transition={{ duration: 0.5 }}
     >
       <Link to="/" className="navbar-logo">
-        <span className="logo-icon">🔐</span>
+        <span className="logo-mark">
+          <span className="logo-icon">◈</span>
+        </span>
         <span className="logo-text">Prep<span className="gold">Vault</span></span>
       </Link>
 

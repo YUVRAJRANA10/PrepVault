@@ -3,30 +3,38 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>PrepVault Admin Report</title>
+    <title>PrepVault Community Snapshot</title>
     <style>
       body { font-family: system-ui, Arial; padding: 24px; background: #0b0b13; color: #e6e6e6 }
       .card { background: #0f1220; padding: 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04); max-width: 520px }
       h1 { color: #f3c06b }
+      .meta { color: #9ea7c7; margin-top: 8px }
+      .section { margin-top: 20px }
+      table { width: 100%; }
+      th, td { padding: 10px 8px; vertical-align: top }
+      th { color: #f3c06b; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em }
+      .pill { display:inline-block; padding: 3px 8px; border-radius: 999px; background: rgba(243,192,107,0.12); color: #f3c06b; font-size: 0.75rem }
+      .action { display:inline-block; padding: 6px 10px; border-radius: 6px; border: 0; cursor: pointer; }
     </style>
   </head>
   <body>
     <div class="card">
-      <h1>PrepVault Report</h1>
-      <p>Total experiences: <strong><%= stats.expCount %></strong></p>
-      <p>Total users: <strong><%= stats.userCount %></strong></p>
+      <h1>PrepVault Community Snapshot</h1>
+      <p class="meta">A quick admin view of what the community is sharing right now.</p>
+      <p>Total stories: <strong><%= stats.expCount %></strong></p>
+      <p>Active members: <strong><%= stats.userCount %></strong></p>
     </div>
-    <div style="margin-top:18px; max-width:960px">
-      <h2>Recent experiences</h2>
+    <div class="section" style="max-width:960px">
+      <h2>Latest stories</h2>
       <div>
         <% const exps = stats.exps || [] %>
         <% if (exps.length === 0) { %>
-          <p class="muted">No experiences yet.</p>
+          <p class="meta">No stories yet.</p>
         <% } else { %>
           <table style="width:100%; border-collapse:collapse; margin-top:12px">
             <thead>
               <tr style="text-align:left; border-bottom:1px solid rgba(255,255,255,0.06)">
-                <th>Company</th><th>Role</th><th>By</th><th>Created</th><th>Actions</th>
+                <th>Company</th><th>Role</th><th>Shared by</th><th>Created</th><th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -38,10 +46,10 @@
                 <td><%= new Date(e.createdAt).toLocaleString() %></td>
                 <td>
                   <form method="POST" action="/admin/experiences/<%= e._id %>/delete" style="display:inline">
-                    <button type="submit" style="background:#ff5c5c;border:none;padding:6px 8px;border-radius:4px;color:#111;">Delete</button>
+                    <button class="action" type="submit" style="background:#ff5c5c;color:#111;">Delete</button>
                   </form>
                   <form method="POST" action="/admin/experiences/<%= e._id %>/flag" style="display:inline;margin-left:8px">
-                    <button type="submit" style="background:#ffc857;border:none;padding:6px 8px;border-radius:4px;color:#111;">Flag</button>
+                    <button class="action" type="submit" style="background:#ffc857;color:#111;">Flag</button>
                   </form>
                 </td>
               </tr>

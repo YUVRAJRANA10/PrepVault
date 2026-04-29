@@ -41,9 +41,9 @@ export default function CompanyBurst() {
           key={p.id}
           className="burst-particle"
           animate={{
-            x: [0, p.tx * 0.08, p.tx],
-            y: [0, p.ty * 0.08, p.ty],
-            opacity: [0, 0, 1, 1, 0],
+            x: [0, p.tx * 0.06, p.tx],
+            y: [0, p.ty * 0.06, p.ty],
+            opacity: [0, 0, 0.95, 1, 0.12],
             scale:   [0.3, 0.65, 1.2, 1.1, 0.5],
           }}
           transition={{
