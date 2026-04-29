@@ -6,7 +6,7 @@ const AVAILABLE_TAGS = ['DSA', 'DBMS', 'OS', 'CN', 'HR']
 
 const EMPTY_FORM = {
   company: '', role: '', rounds: '', difficulty: 3,
-  questions: '', tags: [], tips: '', submittedBy: ''
+  questions: '', tags: [], tips: ''
 }
 
 export default function AddExperienceModal({ onClose, onAdded }) {
@@ -32,26 +32,45 @@ export default function AddExperienceModal({ onClose, onAdded }) {
     setError('')
     setLoading(true)
 
+    // Check if user is logged in
+    const token = localStorage.getItem('token')
+    if (!token) {
+      setError('Please login first to share your experience')
+      setLoading(false)
+      return
+    }
+
     const questionsArray = form.questions
       .split('\n')
       .map(q => q.trim())
       .filter(q => q.length > 0)
 
     try {
-      await createExperience({
+      const response = await createExperience({
         company: form.company,
         role: form.role,
         rounds: Number(form.rounds) || 1,
         difficulty: Number(form.difficulty),
         questions: questionsArray,
         tags: form.tags,
-        tips: form.tips,
-        submittedBy: form.submittedBy.trim() || 'Anonymous'
+        tips: form.tips
       })
-      onAdded()
-      onClose()
+
+      if (response.data.success) {
+        setForm(EMPTY_FORM)
+        onAdded()
+        onClose()
+      } else {
+        setError(response.data.message || 'Failed to submit experience')
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong')
+      if (err.response?.status === 401) {
+        setError('Session expired. Please login again')
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+      } else {
+        setError(err.response?.data?.message || 'Something went wrong')
+      }
     } finally {
       setLoading(false)
     }
@@ -132,12 +151,6 @@ export default function AddExperienceModal({ onClose, onAdded }) {
               <label>Preparation Tips</label>
               <textarea name="tips" value={form.tips} onChange={handleChange}
                 placeholder="What helped you prepare..." rows={3} />
-            </div>
-
-            <div className="form-group">
-              <label>Your Name <span className="muted">(optional)</span></label>
-              <input name="submittedBy" value={form.submittedBy} onChange={handleChange}
-                placeholder="e.g. Priya S." maxLength={40} />
             </div>
 
             {error && <p className="form-error">{error}</p>}

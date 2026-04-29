@@ -35,9 +35,10 @@ export default function Explore() {
     setLoading(true)
     try {
       const res = await getExperiences()
-      setExperiences(res.data)
+      setExperiences(res.data.data || [])
     } catch (e) {
       console.error(e)
+      setExperiences([])
     } finally {
       setLoading(false)
     }
@@ -48,7 +49,7 @@ export default function Explore() {
     if (searchParams.get('company')) setSelectedCompany(searchParams.get('company'))
   }, [])
 
-  const companies = ['All', ...new Set(experiences.map(e => e.company))]
+  const companies = ['All', ...new Set(experiences.map(e => e.company).filter(Boolean))]
 
   const toggleFav = (id) => {
     setFavorites(prev => {

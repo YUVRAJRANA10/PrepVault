@@ -1,29 +1,38 @@
 require('dotenv').config()
 const express = require('express')
+const cors = require('cors')
+const connectDB = require('./config/database')
 
 const app = express()
 const PORT = process.env.PORT || 5000
 
-app.use(express.json()) // middleware: parses incoming JSON request bodies
+// Connect to MongoDB
+connectDB()
 
-const loggerMiddlewear = require('./middleware/loggerMiddleware')
-app.use(loggerMiddlewear)
+// Middleware
+app.use(cors())
+app.use(express.json())
 
-app.use(express.static('public')) // serves public/index.html at http://localhost:5000/
+const loggerMiddleware = require('./middleware/loggerMiddleware')
+app.use(loggerMiddleware)
 
+app.use(express.static('public'))
+
+// Routes
+const authRoutes = require('./routes/authRoutes')
 const experienceRoutes = require('./routes/experienceRoutes')
-app.use('/api/experiences', experienceRoutes)
-
 const analyticsRoutes = require('./routes/analyticsRoutes')
-app.use('/api/analytics', analyticsRoutes)
 
+app.use('/api/auth', authRoutes)
+app.use('/api/experiences', experienceRoutes)
+app.use('/api/analytics', analyticsRoutes)
 
 app.get('/', (req, res) => {
   res.json({ message: 'PrepVault API is running' })
 })
 
 const errorMiddleware = require('./middleware/errorMiddleware')
-app.use(errorMiddleware) // must be last
+app.use(errorMiddleware)
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)

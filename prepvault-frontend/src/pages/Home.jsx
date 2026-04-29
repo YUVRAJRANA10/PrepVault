@@ -25,7 +25,7 @@ export default function Home() {
 
   useEffect(() => {
     getExperiences().then(res => {
-      const data = res.data
+      const data = res.data.data || []
       const companies = [...new Set(data.map(e => e.company))]
       const totalQ = data.reduce((sum, e) => sum + (e.questions?.length || 0), 0)
       setStats({ total: data.length, companies: companies.length, questions: totalQ })
