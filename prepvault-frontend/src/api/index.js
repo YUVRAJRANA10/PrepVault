@@ -22,6 +22,8 @@ export const updateExperience = (id, data) => api.put(`/experiences/${id}`, data
 export const deleteExperience = (id) => api.delete(`/experiences/${id}`)
 export const getCommonQuestions = (company) => api.get(`/analytics/common-questions/${company}`)
 export const getDifficultySummary = () => api.get('/analytics/difficulty-summary')
+export const addComment = (id, text) => api.post(`/experiences/${id}/comments`, { text })
+export const upvoteExperience = (id) => api.post(`/experiences/${id}/upvote`)
 export const registerUser = (data) => api.post('/auth/register', data)
 export const loginUser = (data) => api.post('/auth/login', data)
 

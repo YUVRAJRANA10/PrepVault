@@ -1,4 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { addComment, upvoteExperience } from '../api'
 
 const DIFFICULTY_LABEL = { 1: 'Very Easy', 2: 'Easy', 3: 'Medium', 4: 'Hard', 5: 'Very Hard' }
 const DIFFICULTY_CLASS = { 1: 'easy', 2: 'easy', 3: 'medium', 4: 'hard', 5: 'hard' }
@@ -19,12 +21,41 @@ function DiffBar({ value }) {
 
 export default function ExperienceDrawer({ experience, isFav, onToggleFav, onClose }) {
   if (!experience) return null
-  const { company, role, difficulty, questions = [], tags = [], tips, submittedBy, rounds, createdAt } = experience
-  const expId = experience._id || experience.id
+  const [localExp, setLocalExp] = useState(experience)
+  const [commentText, setCommentText] = useState('')
+  const [submittingComment, setSubmittingComment] = useState(false)
+  const { company, role, difficulty, questions = [], tags = [], tips, submittedBy, rounds, createdAt } = localExp
+  const expId = localExp._id || localExp.id
+
+  useEffect(() => setLocalExp(experience), [experience])
 
   const date = createdAt ? new Date(createdAt).toLocaleDateString('en-IN', {
     day: 'numeric', month: 'short', year: 'numeric'
   }) : null
+
+  const handleAddComment = async () => {
+    if (!commentText || commentText.trim().length === 0) return
+    setSubmittingComment(true)
+    try {
+      const res = await addComment(expId, commentText.trim())
+      // append to local comments
+      setLocalExp(prev => ({ ...prev, comments: [...(prev.comments || []), res.data.data] }))
+      setCommentText('')
+    } catch (err) {
+      console.error('Comment failed', err)
+    } finally {
+      setSubmittingComment(false)
+    }
+  }
+
+  const handleUpvote = async () => {
+    try {
+      const res = await upvoteExperience(expId)
+      setLocalExp(prev => ({ ...prev, upvotes: res.data.data.upvotes }))
+    } catch (err) {
+      console.error('Upvote failed', err)
+    }
+  }
 
   return (
     <AnimatePresence>
@@ -124,6 +155,35 @@ export default function ExperienceDrawer({ experience, isFav, onToggleFav, onClo
               <p className="exp-modal-tips-text">{tips}</p>
             </div>
           )}
+
+          {/* Attachments */}
+          {localExp.attachments && localExp.attachments.length > 0 && (
+            <div className="exp-modal-attachments">
+              <p className="exp-modal-label">Attachments</p>
+              <ul>
+                {localExp.attachments.map((a, i) => (
+                  <li key={i}><a href={a.url} target="_blank" rel="noreferrer">{a.filename}</a></li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Upvotes & Comments */}
+          <div className="exp-modal-engage">
+            <button className="btn-ghost" onClick={handleUpvote}>⬆ Upvote ({localExp.upvotes || 0})</button>
+            <div className="comments-block">
+              <p className="exp-modal-label">Comments</p>
+              <div className="comments-list">
+                {(localExp.comments || []).map((c, i) => (
+                  <div key={i} className="comment-item"><strong>{c.user}:</strong> {c.text}</div>
+                ))}
+              </div>
+              <div className="comment-form">
+                <input placeholder="Add a comment..." value={commentText} onChange={e => setCommentText(e.target.value)} />
+                <button className="btn-primary small" onClick={handleAddComment} disabled={submittingComment}>{submittingComment ? 'Posting...' : 'Post'}</button>
+              </div>
+            </div>
+          </div>
         </div>
       </motion.div>
     </AnimatePresence>

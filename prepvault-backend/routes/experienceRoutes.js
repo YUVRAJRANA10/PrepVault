@@ -4,7 +4,7 @@ const router = express.Router();
 
 const validateExperience = require('../middleware/validationMiddleware')
 const authMiddleware = require('../middleware/authMiddleware')
-const { getAllExperiences, createExperience, updateExperience, deleteExperience } = require('../controllers/experienceController')
+const { getAllExperiences, createExperience, updateExperience, deleteExperience, addComment, upvoteExperience } = require('../controllers/experienceController')
 
 // Multer for attachments
 const multer = require('multer')
@@ -31,6 +31,10 @@ router.post('/:id/attachments', authMiddleware, upload.array('attachments', 6), 
 		res.status(500).json({ success: false, message: err.message })
 	}
 })
+
+// comments and upvotes
+router.post('/:id/comments', authMiddleware, addComment)
+router.post('/:id/upvote', authMiddleware, upvoteExperience)
 
 module.exports = router
 

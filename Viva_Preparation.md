@@ -262,6 +262,10 @@ api.interceptors.response.use(null, async (error) => {
 - Expanded `Experience` schema with richer fields: `notes`, `links`, `resources`, `attachments`, `checklist`, `comments`, `upvotes`, `flagged`. (See `prepvault-backend/models/Experience.js`.)
 - Attachment support for submitting experiences: multipart/form-data handling with `multer`, attachments stored in `prepvault-backend/public/uploads` and attached to `Experience.attachments`. (See `prepvault-backend/routes/experienceRoutes.js` and `prepvault-backend/controllers/experienceController.js`.)
 
+- Comments and upvotes: lightweight comment posting and upvote endpoints were added. Users (authenticated) can post comments and upvote experiences; these update the `Experience.comments` array and `Experience.upvotes` counter. (See `prepvault-backend/controllers/experienceController.js` and `prepvault-backend/routes/experienceRoutes.js`.)
+
+- Frontend: `ExperienceDrawer` now lists attachments, shows comments, allows posting a comment, and lets users upvote an experience. The drawer updates locally and receives `experience-updated` socket broadcasts to stay in sync.
+
 These changes make experiences richer, add basic moderation, enable file attachments, and improve real-time UX for reviewers and users during demo/eval.
 
 ## How to see these changes locally (quick checklist)

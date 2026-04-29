@@ -392,6 +392,17 @@ a { text-decoration: none; color: inherit; }
 }
 .socket-toast:hover { transform: translateY(-2px); }
 
+/* Experience drawer attachments and comments */
+.exp-modal-attachments ul { list-style: none; padding-left: 0; }
+.exp-modal-attachments li { margin: 6px 0; }
+.exp-modal-attachments a { color: var(--gold); font-weight: 600; }
+.exp-modal-engage { margin-top: 12px; display:flex; gap:12px; align-items:flex-start }
+.comments-block { flex: 1 }
+.comments-list { max-height: 160px; overflow-y: auto; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 8px; margin-bottom: 8px }
+.comment-item { font-size: 0.9rem; color: var(--muted); padding: 6px 4px }
+.comment-form { display:flex; gap:8px }
+.comment-form input { flex:1 }
+
 /* ─── Company Logo Burst ──────────────────── */
 .burst-container {
   position: absolute;

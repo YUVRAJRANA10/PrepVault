@@ -70,4 +70,38 @@ async function deleteExperience(req, res) {
   res.json({ success: true, data: deleted })
 }
 
-module.exports = { getAllExperiences, createExperience, updateExperience, deleteExperience }
+async function addComment(req, res) {
+  try {
+    const { id } = req.params
+    const { text } = req.body
+    if (!text || String(text).trim().length === 0) return res.status(400).json({ success: false, message: 'Comment text required' })
+    const exp = await Experience.findById(id)
+    if (!exp) return res.status(404).json({ success: false, message: 'Experience not found' })
+    const user = (req.user && req.user.name) || req.body.user || 'Anonymous'
+    const comment = { user, text: String(text).trim(), createdAt: new Date() }
+    exp.comments.push(comment)
+    await exp.save()
+    // emit updated experience
+    try { require('../socket').getIO().emit('experience-updated', exp) } catch (e) {}
+    res.json({ success: true, data: comment })
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message })
+  }
+}
+
+async function upvoteExperience(req, res) {
+  try {
+    const { id } = req.params
+    const exp = await Experience.findById(id)
+    if (!exp) return res.status(404).json({ success: false, message: 'Experience not found' })
+    exp.upvotes = (exp.upvotes || 0) + 1
+    await exp.save()
+    try { require('../socket').getIO().emit('experience-updated', exp) } catch (e) {}
+    res.json({ success: true, data: { upvotes: exp.upvotes } })
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message })
+  }
+}
+
+module.exports = { getAllExperiences, createExperience, updateExperience, deleteExperience, addComment, upvoteExperience }
+
