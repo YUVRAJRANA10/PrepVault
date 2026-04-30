@@ -19,10 +19,12 @@ export default function AddExperienceModal({ onClose, onAdded }) {
 
   const handleChange = (e) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    setError('') // Clear error when user changes any field
   }
 
   const handleFile = (e) => {
     setFile(e.target.files[0] || null)
+    setError('') // Clear error when user selects file
   }
 
   const toggleTag = (tag) => {
@@ -32,6 +34,7 @@ export default function AddExperienceModal({ onClose, onAdded }) {
         ? prev.tags.filter(t => t !== tag)
         : [...prev.tags, tag]
     }))
+    setError('') // Clear error when user changes tags
   }
 
   const handleSubmit = async (e) => {
