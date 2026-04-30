@@ -1,7 +1,11 @@
 const Experience = require('../models/Experience')
 
 async function getAllExperiences(req, res) {
-  const data = await Experience.find().sort({ createdAt: -1 }).lean()
+  // By default hide flagged experiences from public listings.
+  // Pass `?includeFlagged=true` to include flagged items (for admin tools).
+  const includeFlagged = String(req.query.includeFlagged || '').toLowerCase() === 'true'
+  const filter = includeFlagged ? {} : { flagged: { $ne: true } }
+  const data = await Experience.find(filter).sort({ createdAt: -1 }).lean()
   res.json(data)
 }
 
