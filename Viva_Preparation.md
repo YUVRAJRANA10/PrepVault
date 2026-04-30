@@ -4,9 +4,401 @@ This document is a concise, exam-friendly guide for presenting the PrepVault pro
 
 ---
 
-## Project Overview
-- Purpose: a community-driven web app for sharing interview experiences (company, role, rounds, questions, tips).
-- Stack: React (Vite) frontend — client-side rendering (CSR); Node.js + Express backend; MongoDB (Mongoose); JWT auth; bcrypt for password hashing.
+## 🎯 Key Questions Your Teacher Will Ask (With Project References)
+
+### 1️⃣ **User API — Login & Register Endpoints**
+
+**Q: How does the login/register API work in your project?**
+
+A: We implemented two endpoints in `prepvault-backend/routes/authRoutes.js`:
+
+```javascript
+// POST /api/auth/register — Create new user
+router.post('/register', async (req, res) => {
+  const { name, email, password } = req.body
+  
+  // Validation
+  if (!email.includes('@')) return res.status(400).json({ message: 'Invalid email' })
+  if (password.length < 8) return res.status(400).json({ message: 'Password min 8 chars' })
+  
+  // Hash password using bcrypt
+  const passwordHash = await bcrypt.hash(password, 10)
+  
+  // Create user in MongoDB
+  const user = new User({ name, email, passwordHash })
+  await user.save()
+  
+  // Generate JWT token
+  const token = jwt.sign({ userId: user._id, name: user.name }, process.env.JWT_SECRET)
+  
+  res.status(201).json({ success: true, token })
+})
+
+// POST /api/auth/login — Verify credentials
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body
+  
+  // Find user in MongoDB
+  const user = await User.findOne({ email })
+  if (!user) return res.status(401).json({ message: 'User not found' })
+  
+  // Compare passwords using bcrypt
+  const isMatch = await bcrypt.compare(password, user.passwordHash)
+  if (!isMatch) return res.status(401).json({ message: 'Invalid password' })
+  
+  // Generate JWT token
+  const token = jwt.sign({ userId: user._id, name: user.name }, process.env.JWT_SECRET)
+  
+  res.json({ success: true, token })
+})
+```
+
+**File Reference:** `prepvault-backend/controllers/authController.js`
+
+---
+
+### 2️⃣ **Middleware — What It Does & Why**
+
+**Q: What is middleware in your project and how is it used?**
+
+A: Middleware is a function that intercepts HTTP requests before they reach the route handler. In our project:
+
+**Example 1: Auth Middleware** — Protects routes
+```javascript
+// File: prepvault-backend/middleware/authMiddleware.js
+const authMiddleware = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1] // Extract "Bearer <token>"
+  
+  if (!token) return res.status(401).json({ message: 'No token provided' })
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    req.user = decoded // Attach user data to request
+    next() // Pass to next handler
+  } catch (err) {
+    res.status(401).json({ message: 'Invalid token' })
+  }
+}
+
+// Usage in routes:
+router.post('/api/experiences', authMiddleware, createExperience) 
+// ↑ authMiddleware runs first, then createExperience
+```
+
+**Example 2: Logger Middleware** — Logs every request
+```javascript
+// File: prepvault-backend/middleware/loggerMiddleware.js
+async function logger(req, res, next) {
+  const log = `[${new Date().toISOString()}] ${req.method} ${req.url}\n`
+  await fs.appendFile('./logs/requests.log', log)
+  next() // Pass to next middleware/handler
+}
+
+app.use(logger) // Applied to ALL requests
+```
+
+**Middleware Flow:**
+```
+Request → Logger → Parse JSON → Auth Check → Route Handler → Response
+```
+
+---
+
+### 3️⃣ **Async/Await — How We Use It**
+
+**Q: Explain async/await in your project. Why is it necessary?**
+
+A: `async/await` makes working with Promises simpler. Instead of `.then()` chains, we use `await` to pause code until a Promise resolves.
+
+**Why needed:** Database queries, file operations, and API calls are **asynchronous** — they take time.
+
+**Example from our Project:**
+
+```javascript
+// Without async/await (Callback Hell):
+app.post('/login', (req, res) => {
+  User.findOne({ email: req.body.email }, (err, user) => {
+    if (err) res.status(500).send(err)
+    bcrypt.compare(req.body.password, user.passwordHash, (err, isMatch) => {
+      if (err) res.status(500).send(err)
+      if (isMatch) {
+        const token = jwt.sign(...)
+        res.json({ token })
+      }
+    })
+  })
+})
+
+// With async/await (Clean & Readable):
+app.post('/login', async (req, res) => {
+  const user = await User.findOne({ email: req.body.email }) // Wait for DB query
+  const isMatch = await bcrypt.compare(req.body.password, user.passwordHash) // Wait for comparison
+  const token = jwt.sign(...) // Synchronous
+  res.json({ token })
+})
+```
+
+**File Reference:** `prepvault-backend/controllers/authController.js`
+
+---
+
+### 4️⃣ **JWT Token Generation — How It Works & Console Output**
+
+**Q: How is the JWT token generated in your project? Show the structure.**
+
+A: JWT is generated in `authController.js`:
+
+```javascript
+const jwt = require('jsonwebtoken')
+
+// Generate token after successful login
+const token = jwt.sign(
+  { userId: user._id, name: user.name }, // Payload (data)
+  process.env.JWT_SECRET,                 // Secret key
+  { expiresIn: '7d' }                     // Options
+)
+
+console.log('JWT Generated:', token)
+// Output example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NWY0NTYzYzdjODdkNWY0YjAwZjU1NjEiLCJuYW1lIjoiWXV2cmFqIn0.xK9Z8p...
+```
+
+**Token Payload Verification:**
+```javascript
+// In browser console (frontend):
+const token = localStorage.getItem('token')
+const payload = JSON.parse(atob(token.split('.')[1]))
+console.log('Token Payload:', payload)
+
+// Output:
+// { userId: "65f4563c7c87d5f4b00f5561", name: "Yuvraj", iat: 1714504856, exp: 1715109656 }
+```
+
+---
+
+### 5️⃣ **JWT Structure — Header, Payload, Signature**
+
+**Q: Explain the three parts of a JWT token.**
+
+A: JWT has **3 base64-encoded parts separated by dots (.):**
+
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+.
+eyJ1c2VySWQiOiI2NWY0NTYzYzdjODdkNWY0YjAwZjU1NjEiLCJuYW1lIjoiWXV2cmFqIn0
+.
+xK9Z8p3QmK1LjPvHnV9...
+^                      ^                                                    ^
+Header                 Payload                                             Signature
+```
+
+**Decoded:**
+
+| Part | Content | Example |
+|------|---------|---------|
+| **Header** | Algorithm & type | `{"alg":"HS256","typ":"JWT"}` |
+| **Payload** | User data (claims) | `{"userId":"65f456...","name":"Yuvraj","iat":1714504856,"exp":1715109656}` |
+| **Signature** | HMAC(header.payload, secret) | `xK9Z8p3QmK1LjPvHnV9...` |
+
+**Why 3 parts?**
+- **Header**: Tells the server which algorithm was used
+- **Payload**: Contains the user data and metadata (issued at, expires)
+- **Signature**: Ensures the token hasn't been tampered with (verified using secret)
+
+**Verification Flow:**
+```javascript
+// Server receives token
+const token = req.headers.authorization.split(' ')[1]
+
+// Verify signature using secret
+const decoded = jwt.verify(token, process.env.JWT_SECRET)
+// ↑ If signature is invalid or tampered, this throws error
+// ↑ If token is expired, this throws error
+// ↑ If valid, returns the payload
+
+console.log('Decoded payload:', decoded)
+// { userId: "65f456...", name: "Yuvraj", iat: 1714504856, exp: 1715109656 }
+```
+
+**File Reference:** `prepvault-backend/middleware/authMiddleware.js`
+
+---
+
+### 6️⃣ **Session vs Cookies vs JWT**
+
+**Q: Why did you choose JWT instead of sessions/cookies?**
+
+A: We compared the three approaches:
+
+| Aspect | Sessions | Cookies | JWT (What We Used) |
+|--------|----------|---------|-------------------|
+| **Storage** | Server (memory/DB) | Client (browser) | Client (localStorage/sessionStorage) |
+| **Stateless?** | ❌ Stateful (server tracks) | ❌ Stateful | ✅ Stateless (server just verifies) |
+| **Scalability** | ❌ Hard (each server needs session store) | ❌ Similar issue | ✅ Easy (any server can verify) |
+| **API/Mobile?** | ❌ Cookies not ideal | ❌ Cookies problematic | ✅ Perfect (just send in header) |
+| **Security** | ✅ Good (server-side) | ⚠️ Must use HTTPS + HttpOnly | ⚠️ HttpOnly recommended |
+| **Example** | `req.session.userId = user._id` | `res.cookie('token', token)` | `res.json({ token })` + localStorage |
+
+**Why We Chose JWT:**
+1. **Mobile-friendly** — React Native can store tokens easily
+2. **Scalable** — No session store needed (stateless)
+3. **Microservices-ready** — Different servers can verify the same token
+4. **API-first design** — No reliance on cookies
+
+**Code Example (Our Implementation):**
+
+```javascript
+// Frontend (localStorage + JWT)
+localStorage.setItem('token', jwtToken)
+
+// Frontend (Auto-inject in every request)
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+// Backend (Verify token)
+app.post('/api/experiences', authMiddleware, createExperience)
+// authMiddleware checks Authorization header, verifies JWT
+```
+
+**File References:** 
+- Frontend: `prepvault-frontend/src/api/index.js` (interceptor)
+- Backend: `prepvault-backend/middleware/authMiddleware.js` (verification)
+
+---
+
+### 7️⃣ **Architecture — MVC Pattern & Layers**
+
+**Q: What architecture pattern are you using? Are you using MVC? How is business logic separated?**
+
+A: Yes, we're using **MVC (Model-View-Controller)** pattern:
+
+```
+┌─────────────────────────────────────────────────────┐
+│ Frontend (View Layer) — React Components            │
+│ - AddExperienceModal.jsx                            │
+│ - ExperienceCard.jsx                                │
+│ - Profile.jsx                                       │
+└──────────────────┬──────────────────────────────────┘
+                   │ API calls (axios)
+                   ↓
+┌─────────────────────────────────────────────────────┐
+│ Backend (Controller Layer)                          │
+│ - authController.js (login, register logic)         │
+│ - experienceController.js (create, read, update)    │
+│ - userController.js (favorites, profile)            │
+└──────────────────┬──────────────────────────────────┘
+                   │
+                   ↓
+┌─────────────────────────────────────────────────────┐
+│ Model Layer (MongoDB + Mongoose)                    │
+│ - User.js (schema, validation)                      │
+│ - Experience.js (schema, validation)                │
+└──────────────────┬──────────────────────────────────┘
+                   │ Database
+                   ↓
+            [MongoDB Atlas]
+```
+
+**Layer Breakdown:**
+
+| Layer | File | Responsibility |
+|-------|------|-----------------|
+| **View** | `AddExperienceModal.jsx`, `Profile.jsx` | User interface, form submission |
+| **Controller** | `experienceController.js`, `authController.js` | Business logic, request handling |
+| **Model** | `Experience.js`, `User.js` | Database schema, validation |
+| **Route** | `experienceRoutes.js`, `authRoutes.js` | Map endpoints to controllers |
+| **Middleware** | `authMiddleware.js` | Cross-cutting concerns (auth, logging) |
+
+---
+
+### 8️⃣ **Business Logic — Where Should It Live?**
+
+**Q: Your teacher mentioned "business logic in controller" vs "server class". Which approach do you use?**
+
+A: We use **business logic in the Controller** (standard Node.js pattern). Here's why:
+
+**✅ Our Approach (Controller-based):**
+
+```javascript
+// File: prepvault-backend/controllers/experienceController.js
+
+async function createExperience(req, res) {
+  // Business logic here:
+  
+  // 1. Validate input
+  const { company, role, difficulty, questions } = req.body
+  if (!company || !role) return res.status(400).json({ message: 'Required fields missing' })
+  
+  // 2. Process files
+  const attachments = []
+  if (req.files && req.files.length) {
+    for (const f of req.files) {
+      attachments.push({ filename: f.originalname, url: `/uploads/${f.originalname}` })
+    }
+  }
+  
+  // 3. Create & save to DB
+  const doc = new Experience({
+    company, role, difficulty, questions, attachments,
+    submittedBy: req.user.name || 'Anonymous'
+  })
+  await doc.save()
+  
+  // 4. Emit real-time update
+  const io = require('../socket').getIO()
+  io.emit('new-experience', doc)
+  
+  // 5. Return response
+  res.status(201).json({ success: true, data: doc })
+}
+```
+
+**Alternative Approach (Service/Server Class):**
+
+```javascript
+// If using a separate Service class (not what we do):
+class ExperienceService {
+  static async create(data) {
+    // Business logic...
+  }
+}
+
+// In controller, just call service:
+app.post('/experiences', async (req, res) => {
+  const exp = await ExperienceService.create(req.body)
+  res.json(exp)
+})
+```
+
+**Why We Chose Controller-based:**
+- ✅ Simpler for small-medium projects
+- ✅ All request-response logic in one place
+- ✅ Middleware integration easier
+- ❌ Can become monolithic in large projects
+
+**When to use Service Class:**
+- ❌ Large enterprise apps
+- ❌ Code reuse across multiple routes
+- ❌ Complex business logic that's independent of HTTP
+
+**File Reference:** `prepvault-backend/controllers/experienceController.js`
+
+---
+
+## Summary Table for Quick Reference
+
+| Topic | Our Choice | File Location |
+|-------|-----------|----------------|
+| Auth Pattern | JWT + Bcrypt | `controllers/authController.js` |
+| Middleware Type | Custom middleware functions | `middleware/authMiddleware.js` |
+| Async Pattern | async/await throughout | All controllers |
+| Token Storage | localStorage (frontend) | `src/api/index.js` |
+| Architecture | MVC (Controller-based) | `/controllers`, `/models`, `/routes` |
+| Session vs JWT | JWT chosen | `middleware/authMiddleware.js` |
+
+---
 
 ## Quick summary of core files (where to find important code)
 - Backend root: `prepvault-backend`
