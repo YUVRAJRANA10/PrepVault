@@ -923,3 +923,356 @@ export const clearAuthToken = () => localStorage.removeItem(TOKEN_KEY)
 ---
 
 I've embedded the actual file excerpts above. Next I will run the smoke test and verify the Postman collection if you want; say "do both" to run the tests now or "run smoke test" to just run it.
+
+---
+
+---
+
+## 9️⃣ **Service/Server Class Pattern — Why We Didn't Use It**
+
+**Q: Your teacher asked about "service classes" or "server classes". What is this pattern, and why didn't you use it?**
+
+A: A **Service Class** is a separate file that contains business logic independent of HTTP requests. It's a common pattern in larger applications.
+
+**Service Class Pattern (not what we use):**
+
+```javascript
+// File: prepvault-backend/services/experienceService.js
+// (Hypothetical - we don't actually do this)
+
+class ExperienceService {
+  static async createExperience(companyName, roleName, difficultyLevel, questionsArray) {
+    // Business logic, divorced from HTTP/Express
+    
+    // Validate
+    if (!companyName || !roleName) throw new Error('Required fields missing')
+    if (difficultyLevel < 1 || difficultyLevel > 5) throw new Error('Invalid difficulty')
+    
+    // Create document
+    const doc = new Experience({
+      company: companyName,
+      role: roleName,
+      difficulty: difficultyLevel,
+      questions: questionsArray
+    })
+    
+    await doc.save()
+    return doc
+  }
+  
+  static async getExperiencesByCompany(companyName) {
+    return await Experience.find({ company: companyName })
+  }
+}
+
+module.exports = ExperienceService
+```
+
+**Then controller uses it:**
+
+```javascript
+// File: prepvault-backend/controllers/experienceController.js (with service pattern)
+
+const ExperienceService = require('../services/experienceService')
+
+async function createExperience(req, res) {
+  try {
+    const { company, role, difficulty, questions } = req.body
+    
+    // Call service instead of doing business logic here
+    const exp = await ExperienceService.createExperience(company, role, difficulty, questions)
+    
+    // Only HTTP response handling
+    res.status(201).json({ success: true, data: exp })
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message })
+  }
+}
+```
+
+---
+
+**Our Approach (what we actually use):**
+
+All business logic lives **directly in the controller**:
+
+```javascript
+// File: prepvault-backend/controllers/experienceController.js (our actual approach)
+
+async function createExperience(req, res) {
+  // Business logic HERE in the controller
+  const { company, role, difficulty, questions } = req.body
+  
+  // Validation
+  if (!company || !role) return res.status(400).json({ message: 'Required fields' })
+  if (difficulty < 1 || difficulty > 5) return res.status(400).json({ message: 'Invalid difficulty' })
+  
+  // File handling
+  const attachments = []
+  if (req.files) {
+    for (const f of req.files) {
+      attachments.push({ filename: f.originalname, url: `/uploads/${f.originalname}` })
+    }
+  }
+  
+  // Database operation
+  const doc = new Experience({
+    company, role, difficulty, questions, attachments,
+    submittedBy: req.user.name || 'Anonymous'
+  })
+  await doc.save()
+  
+  // Socket.IO emit
+  const io = require('../socket').getIO()
+  io.emit('new-experience', doc)
+  
+  // Response
+  res.status(201).json({ success: true, data: doc })
+}
+```
+
+---
+
+**Why We Chose Controller-Based Approach:**
+
+| Aspect | Service Pattern | Controller-Based (Ours) |
+|--------|-----------------|------------------------|
+| **Complexity** | More files, more abstractions | Simpler, all in one place |
+| **Learning Curve** | Harder to understand | Easier for beginners |
+| **Code Reuse** | ✅ High (share logic across endpoints) | ❌ Low (duplicated logic possible) |
+| **Testability** | ✅ Easy (test service independently) | ⚠️ Harder (need to mock HTTP) |
+| **Scale** | ✅ Better for enterprise | ❌ Gets messy at scale |
+| **Our Project Size** | ❌ Overkill | ✅ Perfect fit |
+
+**When to use Service Class:**
+- 🔴 Large teams (50+ developers)
+- 🔴 Multiple teams sharing business logic
+- 🔴 Microservices architecture
+- 🔴 Complex business rules (accounting, ecommerce)
+
+**When NOT to use (like us):**
+- ✅ Small-medium projects (< 30 controllers)
+- ✅ Learning/student projects
+- ✅ MVP/startup code
+- ✅ Single team building features
+
+**In our project:** We only have **4 controllers**, so controller-based is perfect. If we grew to 20+ controllers with shared logic, we'd refactor to services. 📈
+
+---
+
+## 🔟 **Complete Project Folder Structure & Responsibilities**
+
+Here's the **entire folder structure** of PrepVault with explanations:
+
+```
+PrepVault/
+│
+├── prepvault-backend/                  ← ALL SERVER LOGIC
+│   │
+│   ├── server.js                       ✨ Main entry point - starts Express server, connects to MongoDB, mounts routes
+│   ├── socket.js                       📡 Socket.IO initialization for real-time events
+│   ├── .env                            🔐 Environment variables (PORT, MONGO_URI, JWT_SECRET) - NEVER commit
+│   ├── .env.example                    📋 Template for teammates (shows what .env should have)
+│   ├── package.json                    📦 Dependencies: express, mongoose, jsonwebtoken, bcryptjs, multer, socket.io, ejs
+│   │
+│   ├── controllers/                    🎮 BUSINESS LOGIC (handle requests, process data)
+│   │   ├── authController.js           🔐 Register/Login - hash passwords, generate JWT
+│   │   ├── experienceController.js     📝 Create/List/Update/Delete experiences, handle comments & upvotes
+│   │   ├── userController.js           👤 Get user profile, manage favorites
+│   │   └── analyticsController.js      📊 Difficulty summary, popular questions
+│   │
+│   ├── models/                         🗄️ DATABASE SCHEMAS (define data structure in MongoDB)
+│   │   ├── User.js                     👥 Schema: name, email, passwordHash, favorites[], createdAt
+│   │   └── Experience.js               📚 Schema: company, role, difficulty, questions[], attachments[], comments[], upvotes, etc.
+│   │
+│   ├── routes/                         🛣️ ENDPOINTS (map URLs to controllers)
+│   │   ├── authRoutes.js               POST /api/auth/register, POST /api/auth/login
+│   │   ├── experienceRoutes.js         GET/POST/PUT/DELETE /api/experiences
+│   │   ├── userRoutes.js               GET /api/user/me, POST /api/user/favorites
+│   │   └── analyticsRoutes.js          GET /api/analytics/...
+│   │
+│   ├── middleware/                     🔗 REQUEST INTERCEPTORS (run before controllers)
+│   │   ├── authMiddleware.js           🔐 Verify JWT token, attach user to request
+│   │   ├── loggerMiddleware.js         📝 Log all requests to requests.log file
+│   │   ├── validationMiddleware.js     ✅ Validate experience data (company, role, difficulty, etc.)
+│   │   └── errorMiddleware.js          ❌ Handle and format errors
+│   │
+│   ├── public/                         📁 STATIC FILES (served by Express)
+│   │   └── uploads/                    📎 User-uploaded files (PDFs, images) - multipart/form-data
+│   │
+│   ├── views/                          🎨 EJS TEMPLATES (server-rendered HTML)
+│   │   └── report.ejs                  👨‍💼 Admin dashboard - lists experiences, Delete/Flag buttons
+│   │
+│   ├── logs/                           📋 APPLICATION LOGS
+│   │   └── requests.log                🔍 Every HTTP request logged here
+│   │
+│   └── node_modules/                   📚 (Auto-generated from package.json)
+│
+│
+├── prepvault-frontend/                 ← ALL CLIENT LOGIC (React + Vite)
+│   │
+│   ├── src/
+│   │   │
+│   │   ├── main.jsx                    🚀 App entry point - mounts React to DOM
+│   │   ├── App.jsx                     🎯 Main app component with routing
+│   │   ├── index.css                   🎨 Global styles (hero, cards, modals, dashboard, theme)
+│   │   ├── App.css                     (Additional app-specific styles)
+│   │   │
+│   │   ├── api/                        🌐 API COMMUNICATION (Axios instance)
+│   │   │   └── index.js                🔌 Centralized API client with auto-injected JWT token, all endpoints
+│   │   │
+│   │   ├── pages/                      📄 FULL PAGE COMPONENTS (routed)
+│   │   │   ├── Home.jsx                🏠 Landing page with vault hero, trust cards, stats
+│   │   │   ├── Explore.jsx             🔍 Browse experiences, filter, create, search
+│   │   │   ├── Profile.jsx             👤 User dashboard - submitted experiences, saved favorites
+│   │   │   ├── Login.jsx               🔑 User login form
+│   │   │   └── Register.jsx            📝 User registration form
+│   │   │
+│   │   ├── components/                 🧩 REUSABLE UI BLOCKS (not full pages)
+│   │   │   ├── Navbar.jsx              🧭 Top navigation bar - logo, profile dropdown, logout
+│   │   │   ├── VaultHero.jsx           💎 Home page hero - animated vault, company logos, product pitch
+│   │   │   ├── CompanyBurst.jsx        🌟 Animated company logos bursting from vault
+│   │   │   ├── AddExperienceModal.jsx  ➕ Modal form - company, role, difficulty, file upload
+│   │   │   ├── ExperienceCard.jsx      🎴 Card displaying one experience (company, role, difficulty)
+│   │   │   └── ExperienceDrawer.jsx    📖 Detailed experience view - questions, tips, comments, attachments
+│   │   │
+│   │   ├── utils/                      🔧 UTILITY FUNCTIONS
+│   │   │   └── socket.js               📡 Socket.IO client connection
+│   │   │
+│   │   └── assets/                     🖼️ Images, icons, etc.
+│   │
+│   ├── vite.config.js                  ⚙️ Vite bundler config - proxies /api & /uploads to localhost:5000
+│   ├── package.json                    📦 Dependencies: react, vite, axios, react-router, framer-motion, socket.io-client
+│   │
+│   └── node_modules/                   📚 (Auto-generated)
+│
+│
+├── Viva_Preparation.md                 📚 THIS FILE - Viva study notes + code snippets
+├── README.md                           📖 Project setup guide (Quick Start, Ports, Stack)
+├── .postman_collection.json            🧪 Postman API collection for testing endpoints
+│
+└── testing/                            ✅ TESTING
+    ├── api_smoke_test.js               🧪 Automated test - register, login, create experience
+    └── README.md                       📋 Testing instructions
+
+```
+
+---
+
+### 📊 Data Flow Through the Architecture
+
+**When a user submits an experience:**
+
+```
+1. Frontend (React)
+   ↓
+   AddExperienceModal.jsx sends FormData with company, role, difficulty, file
+   ↓ (POST to /api/experiences)
+
+2. Backend Route
+   ↓
+   experienceRoutes.js receives request
+   ↓
+
+3. Middleware Stack
+   ↓
+   loggerMiddleware.js → logs request
+   authMiddleware.js → verifies JWT, attaches user
+   multer upload.array() → saves file to /public/uploads
+   validationMiddleware.js → checks company, role, difficulty valid
+   ↓
+
+4. Controller
+   ↓
+   experienceController.createExperience()
+   - Extracts data from req.body, req.files
+   - Creates Experience document
+   - Saves to MongoDB
+   - Emits Socket.IO event 'new-experience'
+   ↓
+
+5. Database
+   ↓
+   MongoDB Experience collection ← saved document
+   ↓
+
+6. Real-time Update
+   ↓
+   Socket.IO server broadcasts to all connected clients
+   ↓
+
+7. Frontend (React)
+   ↓
+   Explore.jsx listens on 'new-experience' event
+   Updates local state, shows toast notification
+   All users see the new experience instantly
+   ↓
+
+8. Response sent back
+   ↓
+   res.status(201).json({ success: true, data: doc })
+```
+
+---
+
+### 🎯 Responsibility Map — Which File Does What?
+
+| Task | File Location | Why? |
+|------|---------------|------|
+| **User Registration** | `authController.js` | Business logic for registering |
+| **Hash Password** | `authController.js` + bcryptjs | Secure password storage |
+| **Generate JWT** | `authController.js` | Create auth token |
+| **Verify Token** | `authMiddleware.js` | Protect routes |
+| **Create Experience** | `experienceController.js` | Handle new experience submission |
+| **Upload File** | `experienceRoutes.js` (multer) | Save file to disk |
+| **Store Data** | `Experience.js` + MongoDB | Persistent storage |
+| **Validate Input** | `validationMiddleware.js` | Reject bad data early |
+| **Render Admin Page** | `server.js` + `report.ejs` | Server-side HTML rendering |
+| **Real-time Updates** | `socket.js` | Broadcast to all clients |
+| **Display Experiences** | `Explore.jsx` | Fetch and show data |
+| **Create Form** | `AddExperienceModal.jsx` | User input interface |
+| **Styling** | `index.css` | All UI appearance |
+| **Make API Calls** | `api/index.js` | Centralized HTTP client |
+| **Handle Favorites** | `userController.js` | Save/load user preferences |
+
+---
+
+### 🔄 How Files Talk to Each Other
+
+```
+Navbar.jsx (Login button)
+   ↓ (calls)
+api/index.js.loginUser()
+   ↓ (POST to)
+authRoutes.js:/api/auth/login
+   ↓ (calls)
+authController.login()
+   ↓ (queries)
+User.findOne() → MongoDB User collection
+   ↓ (compares hash)
+bcrypt.compare()
+   ↓ (generates)
+jwt.sign() ← creates token
+   ↓ (returns)
+res.json({ token })
+   ↓ (stored in)
+localStorage.setItem('token')
+   ↓ (interceptor auto-adds to)
+Authorization: Bearer <token>
+   ↓ (in future requests)
+authMiddleware.js verifies it
+   ↓
+req.user.name ← available in controller
+```
+
+---
+
+**Summary:** Our project is well-organized with clear separation:
+- **Backend:** Handles data, auth, business logic
+- **Frontend:** Handles UI, user interaction
+- **Middleware:** Guards and logs requests
+- **Controllers:** All business logic (we chose not to extract to services)
+- **Models:** Define data shapes
+- **Routes:** Map endpoints to controllers
+
+This is **standard Node.js/Express + React architecture** and is exactly what your teacher expects! ✅
