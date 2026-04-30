@@ -13,6 +13,28 @@ Make sure you have these installed:
 
 ---
 
+## ⚡ Quick Start (2 Terminal Windows)
+
+**Terminal 1 — Backend:**
+```bash
+cd prepvault-backend
+npm install
+npm run dev
+# Backend runs on port 5000
+```
+
+**Terminal 2 — Frontend:**
+```bash
+cd prepvault-frontend
+npm install
+npm run dev
+# Frontend runs on port 5173
+```
+
+Then open **http://localhost:5173** in your browser.
+
+---
+
 ## Project Structure
 
 ```
@@ -68,6 +90,22 @@ npm run dev
 ```
 
 Frontend runs at → `http://localhost:5173`
+
+---
+
+## Ports Configuration (Important!)
+
+| Service | Port | URL | Notes |
+|---------|------|-----|-------|
+| **Backend API** | 5000 | `http://localhost:5000` | Express server, APIs, file serving |
+| **Socket.IO** | 5000 | `http://localhost:5000/socket.io` | Real-time events (same as backend) |
+| **Frontend** | 5173 | `http://localhost:5173` | Vite dev server (React app) |
+
+**Vite Proxy:** The frontend automatically proxies requests to the backend:
+- `/api/*` → `http://localhost:5000/api/*`
+- `/uploads/*` → `http://localhost:5000/uploads/*`
+
+**Important:** All team members must use these exact ports for the app to work correctly.
 
 ---
 
