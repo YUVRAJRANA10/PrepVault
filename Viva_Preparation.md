@@ -1276,3 +1276,176 @@ req.user.name ← available in controller
 - **Routes:** Map endpoints to controllers
 
 This is **standard Node.js/Express + React architecture** and is exactly what your teacher expects! ✅
+
+---
+
+## 1️⃣1️⃣ **Testing & Validation Files**
+
+Your project includes two ways to test the API:
+
+### **Option 1: Smoke Test Script** 🚀
+
+**File:** `testing/api_smoke_test.js`
+
+**What it does:**
+Automated test script that verifies all core functionality works:
+
+```javascript
+// testing/api_smoke_test.js (simplified flow)
+
+// 1️⃣ Register new user
+POST /api/auth/register
+  ↓ Creates user in MongoDB
+  ↓ Returns JWT token
+  
+// 2️⃣ Login with credentials
+POST /api/auth/login
+  ↓ Verifies password
+  ↓ Returns JWT token
+  
+// 3️⃣ Create experience (authenticated)
+POST /api/experiences (with Bearer token)
+  ↓ Creates experience in MongoDB
+  ↓ Emits Socket.IO event
+  
+// 4️⃣ List experiences
+GET /api/experiences
+  ↓ Returns all experiences
+  
+// 5️⃣ Get user profile
+GET /api/users/me (with Bearer token)
+  ↓ Returns current user email
+```
+
+**How to run:**
+
+```bash
+# Terminal 1: Start backend (ensure MongoDB running)
+cd prepvault-backend
+node server.js
+
+# Terminal 2: Run test
+cd prepvault (root)
+node testing/api_smoke_test.js
+
+# Output example:
+# PrepVault smoke test starting against http://localhost:5000
+# Register: 201 { message: 'User created' }
+# Login: 200 ok
+# Create experience: 201 created
+# List experiences: 200 5 items
+# Profile: 200 yuvraj@test.com
+# Smoke test finished
+```
+
+**Why use it:** Quick automated validation of entire flow (register → login → create → list).
+
+---
+
+### **Option 2: Postman Collection** 📮
+
+**File:** `.postman_collection_prepvault.json` (in root)
+
+**What it is:**
+A JSON file containing **pre-built API requests** you can import into Postman to manually test endpoints with a GUI.
+
+**How to use it:**
+
+**Step 1: Install Postman** (free at postman.com)
+
+**Step 2: Import collection**
+- Open Postman → Click **Import** button
+- Select `.postman_collection_prepvault.json`
+- Collection appears in left sidebar
+
+**Step 3: Test endpoints**
+```
+📦 PrepVault Collection
+│
+├── 🔐 Auth
+│   ├── POST /auth/register
+│   │   (Form: name, email, password)
+│   └── POST /auth/login
+│       (Form: email, password)
+│
+├── 📝 Experiences
+│   ├── GET /experiences
+│   ├── POST /experiences (create new)
+│   ├── PUT /experiences/:id (update)
+│   ├── DELETE /experiences/:id
+│   ├── POST /experiences/:id/comments
+│   └── POST /experiences/:id/upvote
+│
+└── 👤 Users
+    ├── GET /users/me (get profile)
+    └── POST /users/favorites
+```
+
+**Example workflow in Postman:**
+
+```
+1. Run Register request
+   ← Copies token automatically to environment variable
+   
+2. Run Login request
+   ← Copies token to environment
+   
+3. Run Create Experience request
+   ← Token auto-injected from environment
+   ← See response in UI
+   
+4. Run Get Experiences
+   ← See all created experiences
+```
+
+**Why use it:** 
+- Visual interface (easier than terminal)
+- Pre-configured with auth headers
+- Good for manual testing & demo
+- Save requests for later use
+
+---
+
+### **Comparison: Smoke Test vs Postman** 📊
+
+| Feature | Smoke Test | Postman |
+|---------|-----------|---------|
+| **Automation** | ✅ Fully automated | ❌ Manual clicking |
+| **Speed** | ⚡ Fast (run once) | 🐢 Slower (each request) |
+| **Visual** | 📝 Console output | 🎨 Beautiful UI |
+| **Good for** | CI/CD, quick validation | Manual testing, demo, learning |
+| **Setup** | Just `node` | Need Postman app |
+| **Debugging** | See all steps in output | Click each request, inspect response |
+
+---
+
+### **In Your Folder Structure:**
+
+```
+PrepVault/
+│
+├── testing/                            ✅ AUTOMATED TESTING
+│   ├── api_smoke_test.js               🚀 Node.js script - validates register→login→create→list flow
+│   └── README.md                       📋 Instructions for running smoke test
+│
+├── .postman_collection_prepvault.json  📮 Postman requests - manual testing with GUI
+│
+├── Viva_Preparation.md                 📚 This file - study notes
+├── README.md                           📖 Quick start + ports
+│
+└── [Backend + Frontend folders...]
+```
+
+---
+
+### **How to Demo in Viva** 🎓
+
+When your teacher asks "How do you test your API?", you can say:
+
+> "We have two testing approaches. First, for **automated validation**, we have a smoke test script in `/testing/api_smoke_test.js` that runs through the entire flow — register, login, create experience, list, and get profile. It's useful for quick checks in development. 
+> 
+> Second, for **manual testing and demo**, we use Postman. I import `.postman_collection_prepvault.json` which has pre-configured requests with authentication headers. This makes it easy to test individual endpoints and see responses visually.
+> 
+> Both validate that the API works correctly. [Show one or both running if time permits]"
+
+This shows you understand both **automated** and **manual** testing! ✅
