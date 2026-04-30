@@ -39,6 +39,14 @@ export default function AddExperienceModal({ onClose, onAdded }) {
     setError('')
     setLoading(true)
 
+    // Validate difficulty is a number between 1 and 5
+    const diffValue = Number(form.difficulty)
+    if (isNaN(diffValue) || diffValue < 1 || diffValue > 5) {
+      setError('Difficulty must be a number between 1 and 5')
+      setLoading(false)
+      return
+    }
+
     const questionsArray = form.questions
       .split('\n')
       .map(q => q.trim())
@@ -127,7 +135,7 @@ export default function AddExperienceModal({ onClose, onAdded }) {
                   value={form.rounds} onChange={handleChange} placeholder="e.g. 3" />
               </div>
               <div className="form-group">
-                <label>Difficulty: <span className="gold">{form.difficulty}/5</span></label>
+                <label>Difficulty (1-5): <span className="gold">{Math.max(1, Math.min(5, Number(form.difficulty) || 3))}/5</span></label>
                 <input name="difficulty" type="range" min="1" max="5"
                   value={form.difficulty} onChange={handleChange} className="slider" />
               </div>
