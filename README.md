@@ -47,12 +47,6 @@ Create a `.env` file inside `prepvault-backend/`:
 PORT=5000
 ```
 
-Create the logs folder (required for logger middleware):
-
-```bash
-mkdir logs
-```
-
 Start the backend:
 
 ```bash
@@ -77,6 +71,20 @@ Frontend runs at → `http://localhost:5173`
 
 ---
 
+## Environment
+
+Create `prepvault-backend/.env` with at least:
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_long_random_secret
+```
+
+The backend now creates `prepvault-backend/logs/` automatically if it does not exist, so teammates do not need to create the folder manually.
+
+---
+
 ## API Routes
 
 | Method | Route | Description |
@@ -94,4 +102,4 @@ Frontend runs at → `http://localhost:5173`
 
 - **Backend** — Node.js, Express.js v5, fs/promises, Morgan, dotenv
 - **Frontend** — React (Vite), React Router, Framer Motion, Axios
-- **Storage** — JSON file (`data/experiences.json`)
+- **Storage** — MongoDB (Mongoose)
