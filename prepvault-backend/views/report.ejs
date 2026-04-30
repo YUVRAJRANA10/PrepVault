@@ -48,9 +48,16 @@
                   <form method="POST" action="/admin/experiences/<%= e._id %>/delete" style="display:inline">
                     <button class="action" type="submit" style="background:#ff5c5c;color:#111;">Delete</button>
                   </form>
-                  <form method="POST" action="/admin/experiences/<%= e._id %>/flag" style="display:inline;margin-left:8px">
-                    <button class="action" type="submit" style="background:#ffc857;color:#111;">Flag</button>
-                  </form>
+                  <% if (e.flagged) { %>
+                    <span class="pill" style="background: rgba(255,92,92,0.12); color:#ff5c5c; margin-left:8px">Flagged</span>
+                    <form method="POST" action="/admin/experiences/<%= e._id %>/unflag" style="display:inline;margin-left:8px">
+                      <button class="action" type="submit" style="background:#6ee7b7;color:#081;">Unflag</button>
+                    </form>
+                  <% } else { %>
+                    <form method="POST" action="/admin/experiences/<%= e._id %>/flag" style="display:inline;margin-left:8px">
+                      <button class="action" type="submit" style="background:#ffc857;color:#111;">Flag</button>
+                    </form>
+                  <% } %>
                 </td>
               </tr>
             <% } %>

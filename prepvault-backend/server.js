@@ -101,6 +101,20 @@ app.post('/admin/experiences/:id/flag', async (req, res) => {
   }
 })
 
+// Admin unflag action
+app.post('/admin/experiences/:id/unflag', async (req, res) => {
+  try {
+    const Experience = require('./models/Experience')
+    const exp = await Experience.findById(req.params.id)
+    if (!exp) return res.redirect('/admin/report')
+    exp.flagged = false
+    await exp.save()
+    res.redirect('/admin/report')
+  } catch (err) {
+    res.status(500).send('Failed to unflag')
+  }
+})
+
 const errorMiddleware = require('./middleware/errorMiddleware')
 app.use(errorMiddleware) // must be last
 
