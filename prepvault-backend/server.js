@@ -29,6 +29,24 @@ app.use(loggerMiddlewear)
 
 app.use(express.static('public')) // serves public/index.html at http://localhost:5000/
 
+// Handle file downloads with correct headers
+app.get('/uploads/:filename', (req, res) => {
+  const filename = req.params.filename
+  const filepath = path.join(__dirname, 'public/uploads', filename)
+  
+  // Security: prevent directory traversal
+  const normalizedPath = path.normalize(filepath)
+  if (!normalizedPath.startsWith(path.join(__dirname, 'public/uploads'))) {
+    return res.status(403).json({ success: false, message: 'Access denied' })
+  }
+  
+  res.download(filepath, filename, (err) => {
+    if (err && !res.headersSent) {
+      res.status(404).json({ success: false, message: 'File not found' })
+    }
+  })
+})
+
 const experienceRoutes = require('./routes/experienceRoutes')
 app.use('/api/experiences', experienceRoutes)
 

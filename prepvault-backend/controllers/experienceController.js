@@ -11,7 +11,18 @@ async function createExperience(req, res) {
   const attachments = []
   if (req.files && req.files.length) {
     for (const f of req.files) {
-      attachments.push({ filename: f.originalname, url: `/uploads/${f.filename}`, mime: f.mimetype })
+      // Use original filename in URL for proper downloads
+      attachments.push({ filename: f.originalname, url: `/uploads/${f.originalname}`, mime: f.mimetype })
+    }
+  }
+
+  // Parse stringified JSON arrays from multipart/form-data
+  let tags = req.body.tags || []
+  if (typeof tags === 'string') {
+    try {
+      tags = JSON.parse(tags)
+    } catch (e) {
+      tags = []
     }
   }
 
@@ -21,12 +32,12 @@ async function createExperience(req, res) {
     difficulty,
     questions,
     rounds: req.body.rounds || 1,
-    tags: req.body.tags || [],
+    tags,
     tips: req.body.tips || '',
     notes: req.body.notes || '',
-    links: req.body.links ? JSON.parse(req.body.links) : (req.body.links || []),
-    resources: req.body.resources ? JSON.parse(req.body.resources) : (req.body.resources || []),
-    checklist: req.body.checklist ? JSON.parse(req.body.checklist) : (req.body.checklist || []),
+    links: req.body.links ? (typeof req.body.links === 'string' ? JSON.parse(req.body.links) : req.body.links) : [],
+    resources: req.body.resources ? (typeof req.body.resources === 'string' ? JSON.parse(req.body.resources) : req.body.resources) : [],
+    checklist: req.body.checklist ? (typeof req.body.checklist === 'string' ? JSON.parse(req.body.checklist) : req.body.checklist) : [],
     attachments,
     submittedBy: (req.user && req.user.name) || req.body.submittedBy || 'Anonymous'
   })
