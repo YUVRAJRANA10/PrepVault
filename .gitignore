@@ -1,0 +1,12 @@
+# Ignore local docs that should not be pushed to remote
+PPT_CONTENT.txt
+Plan.md
+Viva_Preparation.md
+keys-pass
+
+# Node/IDE ignores (keep existing project ignores in subfolders)
+node_modules/
+.env
+.env.local
+dist/
+build/
