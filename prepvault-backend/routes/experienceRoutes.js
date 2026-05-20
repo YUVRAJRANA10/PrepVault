@@ -17,13 +17,13 @@ fs.mkdir(uploadsDir, { recursive: true }).catch(err => console.warn('Could not c
 
 // Custom storage engine to preserve original filenames
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir)
-  },
-  filename: (req, file, cb) => {
-    // Preserve original filename with extension
-    cb(null, file.originalname)
-  }
+	destination: (req, file, cb) => {
+		cb(null, uploadsDir)
+	},
+	filename: (req, file, cb) => {
+		// Preserve original filename with extension
+		cb(null, file.originalname)
+	}
 })
 
 const upload = multer({ storage })
@@ -41,7 +41,6 @@ router.post('/:id/attachments', authMiddleware, upload.array('attachments', 6), 
 		const exp = await Experience.findById(req.params.id)
 		if (!exp) return res.status(404).json({ success: false, message: 'Experience not found' })
 		for (const f of req.files) {
-			// Use original filename in URL for proper downloads
 			exp.attachments.push({ filename: f.originalname, url: `/uploads/${f.originalname}`, mime: f.mimetype })
 		}
 		await exp.save()

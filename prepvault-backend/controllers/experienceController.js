@@ -15,7 +15,6 @@ async function createExperience(req, res) {
   const attachments = []
   if (req.files && req.files.length) {
     for (const f of req.files) {
-      // Use original filename in URL for proper downloads
       attachments.push({ filename: f.originalname, url: `/uploads/${f.originalname}`, mime: f.mimetype })
     }
   }

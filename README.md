@@ -117,6 +117,10 @@ Create `prepvault-backend/.env` with at least:
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_long_random_secret
+POSTGRES_URL=postgresql://username:password@localhost:5432/prepvault_analytics
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 The backend now creates `prepvault-backend/logs/` automatically if it does not exist, so teammates do not need to create the folder manually.
@@ -133,6 +137,8 @@ The backend now creates `prepvault-backend/logs/` automatically if it does not e
 | DELETE | `/api/experiences/:id` | Delete an experience |
 | GET | `/api/analytics/difficulty-summary` | Difficulty breakdown |
 | GET | `/api/analytics/common-questions/:company` | Top questions by company |
+| POST | `/api/analytics/daily-snapshot` | Save daily analytics snapshot (PostgreSQL) |
+| GET | `/api/analytics/daily-snapshot?limit=30` | Read analytics snapshots (PostgreSQL) |
 
 ---
 
@@ -141,3 +147,28 @@ The backend now creates `prepvault-backend/logs/` automatically if it does not e
 - **Backend** — Node.js, Express.js v5, fs/promises, Morgan, dotenv
 - **Frontend** — React (Vite), React Router, Framer Motion, Axios
 - **Storage** — MongoDB (Mongoose)
+- **Analytics** — PostgreSQL + Prisma
+- **Uploads** — Multer + Cloudinary
+
+---
+
+## Testing (Jest)
+
+Run backend unit tests:
+
+```bash
+cd prepvault-backend
+npm test
+```
+
+---
+
+## Deployment (Vercel + Render)
+
+**Frontend (Vercel)**
+- Build command: `npm run build`
+- Output directory: `dist`
+
+**Backend (Render)**
+- Start command: `node server.js`
+- Add env vars from `.env` (MONGO_URI, JWT_SECRET, POSTGRES_URL, Cloudinary keys)
