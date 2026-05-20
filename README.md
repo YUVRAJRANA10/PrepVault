@@ -118,9 +118,13 @@ PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_long_random_secret
 POSTGRES_URL=postgresql://username:password@localhost:5432/prepvault_analytics
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
+```
+
+Create `prepvault-frontend/.env` for deployment targets (optional for local):
+
+```env
+VITE_API_URL=http://localhost:5000/api
+VITE_SOCKET_URL=http://localhost:5000
 ```
 
 The backend now creates `prepvault-backend/logs/` automatically if it does not exist, so teammates do not need to create the folder manually.
@@ -148,7 +152,7 @@ The backend now creates `prepvault-backend/logs/` automatically if it does not e
 - **Frontend** — React (Vite), React Router, Framer Motion, Axios
 - **Storage** — MongoDB (Mongoose)
 - **Analytics** — PostgreSQL + Prisma
-- **Uploads** — Multer + Cloudinary
+- **Uploads** — Multer (local disk)
 
 ---
 
@@ -168,7 +172,10 @@ npm test
 **Frontend (Vercel)**
 - Build command: `npm run build`
 - Output directory: `dist`
+- Env vars:
+	- `VITE_API_URL=https://prepvault-llwu.onrender.com/api`
+	- `VITE_SOCKET_URL=https://prepvault-llwu.onrender.com`
 
 **Backend (Render)**
 - Start command: `node server.js`
-- Add env vars from `.env` (MONGO_URI, JWT_SECRET, POSTGRES_URL, Cloudinary keys)
+- Add env vars from `.env` (MONGO_URI, JWT_SECRET, POSTGRES_URL)
