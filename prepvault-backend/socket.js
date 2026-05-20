@@ -1,9 +1,16 @@
 let ioInstance = null
 
+function getCorsOrigins() {
+  return (process.env.CORS_ORIGINS || 'http://localhost:5173,https://prep-vault-phi.vercel.app')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+}
+
 function init(server) {
   const { Server } = require('socket.io')
-  // Frontend runs on 5173 by default (Vite dev server)
-  ioInstance = new Server(server, { cors: { origin: 'http://localhost:5173', credentials: true } })
+  // Allow local dev and deployed frontend origins
+  ioInstance = new Server(server, { cors: { origin: getCorsOrigins(), credentials: true } })
   ioInstance.on('connection', (socket) => {
     console.log('Socket connected:', socket.id)
     socket.on('disconnect', () => console.log('Socket disconnected:', socket.id))

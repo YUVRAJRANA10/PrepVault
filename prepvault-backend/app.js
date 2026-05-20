@@ -1,8 +1,23 @@
 require('dotenv').config()
 const express = require('express')
 const path = require('path')
+const cors = require('cors')
 
 const app = express()
+
+const corsOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173,https://prep-vault-phi.vercel.app')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true)
+    if (corsOrigins.includes(origin)) return callback(null, true)
+    return callback(new Error('Not allowed by CORS'))
+  },
+  credentials: true
+}))
 
 app.use(express.json()) // middleware: parses incoming JSON request bodies
 
