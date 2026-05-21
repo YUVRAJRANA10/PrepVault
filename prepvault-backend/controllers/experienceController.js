@@ -1,4 +1,6 @@
 const Experience = require('../models/Experience')
+let cloudinaryUtil = null
+try { cloudinaryUtil = require('../utils/cloudinary') } catch (e) { cloudinaryUtil = null }
 
 async function getAllExperiences(req, res) {
   // By default hide flagged experiences from public listings.
@@ -14,8 +16,23 @@ async function createExperience(req, res) {
   // Support multipart/form-data (attachments) and JSON bodies
   const attachments = []
   if (req.files && req.files.length) {
-    for (const f of req.files) {
-      attachments.push({ filename: f.originalname, url: `/uploads/${f.originalname}`, mime: f.mimetype })
+    // If Cloudinary is configured, files will be in memory buffers
+    if (cloudinaryUtil && req.files[0] && req.files[0].buffer) {
+      for (const f of req.files) {
+        try {
+          // upload buffer to Cloudinary
+          // eslint-disable-next-line no-await-in-loop
+          const result = await cloudinaryUtil.uploadBuffer(f.buffer)
+          attachments.push({ filename: result.public_id, url: result.secure_url, mime: f.mimetype })
+        } catch (err) {
+          // fallback: still push originalname with no remote url
+          attachments.push({ filename: f.originalname, url: '', mime: f.mimetype })
+        }
+      }
+    } else {
+      for (const f of req.files) {
+        attachments.push({ filename: f.originalname, url: `/uploads/${f.originalname}`, mime: f.mimetype })
+      }
     }
   }
 
@@ -96,7 +113,7 @@ async function addComment(req, res) {
     exp.comments.push(comment)
     await exp.save()
     // emit updated experience
-    try { require('../socket').getIO().emit('experience-updated', exp) } catch (e) {}
+    try { require('../socket').getIO().to(`exp:${exp._id}`).emit('experience-updated', exp) } catch (e) {}
     res.json({ success: true, data: comment })
   } catch (err) {
     res.status(500).json({ success: false, message: err.message })
@@ -108,10 +125,20 @@ async function upvoteExperience(req, res) {
     const { id } = req.params
     const exp = await Experience.findById(id)
     if (!exp) return res.status(404).json({ success: false, message: 'Experience not found' })
-    exp.upvotes = (exp.upvotes || 0) + 1
+    const userId = (req.user && (req.user.id || req.user._id)) ? String(req.user.id || req.user._id) : null
+    if (!userId) return res.status(401).json({ success: false, message: 'Authentication required to upvote' })
+    exp.upvoters = exp.upvoters || []
+    const already = exp.upvoters.map(String).includes(userId)
+    if (already) {
+      // toggle: remove upvote
+      exp.upvoters = exp.upvoters.filter(u => String(u) !== userId)
+    } else {
+      exp.upvoters.push(userId)
+    }
+    exp.upvotes = exp.upvoters.length
     await exp.save()
-    try { require('../socket').getIO().emit('experience-updated', exp) } catch (e) {}
-    res.json({ success: true, data: { upvotes: exp.upvotes } })
+    try { require('../socket').getIO().to(`exp:${exp._id}`).emit('experience-updated', exp) } catch (e) {}
+    res.json({ success: true, data: { upvotes: exp.upvotes, liked: !already } })
   } catch (err) {
     res.status(500).json({ success: false, message: err.message })
   }

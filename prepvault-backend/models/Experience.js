@@ -17,6 +17,7 @@ const experienceSchema = new mongoose.Schema({
   checklist: { type: [{ text: String, done: Boolean }], default: [] },
   comments: { type: [{ user: String, text: String, createdAt: Date }], default: [] },
   upvotes: { type: Number, default: 0 },
+  upvoters: { type: [String], default: [] },
   flagged: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 })
